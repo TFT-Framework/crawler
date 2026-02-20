@@ -1,4 +1,4 @@
-package es.ulpgc.eii.spool.domain.crawler;
+package es.ulpgc.eii.spool.domain.crawler.strategy;
 
 import es.ulpgc.eii.spool.domain.Event;
 
