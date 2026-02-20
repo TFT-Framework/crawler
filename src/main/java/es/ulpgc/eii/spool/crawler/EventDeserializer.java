@@ -1,6 +1,6 @@
-package es.ulpgc.eii.spool.domain.crawler;
+package es.ulpgc.eii.spool.crawler;
 
-import es.ulpgc.eii.spool.domain.Event;
+import es.ulpgc.eii.spool.Event;
 
 public interface EventDeserializer<R, T extends Event> {
     T deserialize(R raw);

@@ -1,6 +1,6 @@
-package es.ulpgc.eii.spool.domain.crawler.strategy;
+package es.ulpgc.eii.spool.crawler.strategy;
 
-import es.ulpgc.eii.spool.domain.Event;
+import es.ulpgc.eii.spool.Event;
 
 import java.util.stream.Stream;
 

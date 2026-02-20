@@ -1,4 +1,4 @@
-package es.ulpgc.eii.spool.domain.crawler;
+package es.ulpgc.eii.spool.crawler;
 
 import java.util.function.Consumer;
 

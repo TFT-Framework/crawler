@@ -1,4 +1,4 @@
-package es.ulpgc.eii.spool.domain;
+package es.ulpgc.eii.spool;
 
 import java.time.Instant;
 

@@ -1,8 +1,8 @@
-package es.ulpgc.eii.spool.domain.crawler.strategy;
+package es.ulpgc.eii.spool.crawler.strategy;
 
-import es.ulpgc.eii.spool.domain.Event;
-import es.ulpgc.eii.spool.domain.EventBuffer;
-import es.ulpgc.eii.spool.domain.crawler.EventDeserializer;
+import es.ulpgc.eii.spool.Event;
+import es.ulpgc.eii.spool.EventBuffer;
+import es.ulpgc.eii.spool.crawler.EventDeserializer;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
