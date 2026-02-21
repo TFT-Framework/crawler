@@ -21,6 +21,6 @@ jobs:
           distribution: 'temurin'
 
       - name: Publish SNAPSHOT to GitHub Packages
-        run: mvn deploy -B --no-transfer-progress -DskipTests
+        run: mvn deploy -B -DskipTests -Dgpg.skip=true -Dmaven.javadoc.skip=false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
