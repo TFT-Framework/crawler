@@ -1,4 +1,4 @@
-name: Publish SNAPSHOT to TFT-Framework
+name: Publish to TFT-Framework Packages
 on:
   push:
     branches: [ develop ]
@@ -7,6 +7,7 @@ on:
 permissions:
   packages: write
   contents: read
+  id-token: write  # ← AÑADIDO para OIDC auth
 
 jobs:
   publish:
@@ -20,7 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Publish SNAPSHOT to GitHub Packages
-        run: mvn deploy -B -DskipTests -Dgpg.skip=true -Dmaven.javadoc.skip=false
+      - name: Publish to GitHub Packages
+        run: mvn deploy -B --no-transfer-progress -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
