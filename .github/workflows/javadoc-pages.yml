@@ -39,4 +39,4 @@ jobs:
           publish_dir: ./doc
           publish_branch: gh-pages
           force_orphan: true
-          commit_message: "Deploy Javadoc $(date)"
+          commit_message: "Deploy Javadoc"
