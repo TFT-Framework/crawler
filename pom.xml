@@ -6,11 +6,11 @@
 
     <groupId>es.ulpgc.eii</groupId>
     <artifactId>spool-crawler</artifactId>
-    <version>1.0.0-dev</version>
+    <version>1.0.1-dev</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Descripción de tu proyecto</description>
+    <description>Crawler framework for event driven systems</description>
     <url>https://github.com/TFT-Framework/spool-crawler</url>
 
     <licenses>
