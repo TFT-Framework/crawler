@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"es.ulpgc.eii.spool"},{"l":"es.ulpgc.eii.spool.crawler"},{"l":"es.ulpgc.eii.spool.crawler.strategy"}];updateSearchResults();
