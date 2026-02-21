@@ -6,12 +6,12 @@
 
     <groupId>es.ulpgc.eii</groupId>
     <artifactId>spool-crawler</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-dev</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Descripción de tu proyecto</description>
-    <url>https://github.com/TU_USER/spool-crawler</url>
+    <url>https://github.com/TFT-Framework/spool-crawler</url>
 
     <licenses>
         <license>
@@ -30,9 +30,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/TFT-Framework/crawler.git</connection>
-        <developerConnection>scm:git:ssh://github.com/TFT-Framework/crawler.git</developerConnection>
-        <url>https://github.com/TFT-Framework/crawler/tree/main</url>
+        <connection>scm:git:git@github.com:TFT-Framework/spool-crawler.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/TFT-Framework/spool-crawler.git</developerConnection>
+        <url>https://github.com/TFT-Framework/spool-crawler</url>
     </scm>
 
     <properties>
@@ -46,11 +46,6 @@
             <name>TFT-Framework GitHub Packages</name>
             <url>https://maven.pkg.github.com/TFT-Framework/packages</url>
         </repository>
-        <snapshotRepository>
-            <id>github</id>
-            <name>TFT-Framework GitHub Packages SNAPSHOT</name>
-            <url>https://maven.pkg.github.com/TFT-Framework/packages</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <build>
