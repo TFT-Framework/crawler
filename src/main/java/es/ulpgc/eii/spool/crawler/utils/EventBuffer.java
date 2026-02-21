@@ -1,4 +1,6 @@
-package es.ulpgc.eii.spool;
+package es.ulpgc.eii.spool.crawler.utils;
+
+import es.ulpgc.eii.spool.core.model.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +9,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
 public final class EventBuffer<T extends Event> {
-
     private final Queue<T> buffer = new ConcurrentLinkedQueue<>();
+
+    private EventBuffer() {}
 
     public static <T extends Event> EventBuffer<T> initialize() {
         return new EventBuffer<>();

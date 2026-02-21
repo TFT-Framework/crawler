@@ -1,17 +1,15 @@
 package es.ulpgc.eii.spool.crawler.strategy;
 
-import es.ulpgc.eii.spool.Event;
-import es.ulpgc.eii.spool.EventBuffer;
-import es.ulpgc.eii.spool.crawler.EventDeserializer;
+import es.ulpgc.eii.spool.core.model.Event;
+import es.ulpgc.eii.spool.crawler.utils.EventBuffer;
+import es.ulpgc.eii.spool.crawler.utils.EventDeserializer;
+import es.ulpgc.eii.spool.crawler.source.EventInbox;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface WebhookCrawlerStrategy<R, T extends Event> extends CrawlerStrategy<T> {
-
-    void receive(R raw);
-
-    static <R> WebhookSourceStep<R> from(Class<R> rawType) {
+public interface WebhookCrawlerStrategy<R, T extends Event> extends EventSource<T>, EventInbox<R> {
+    static <R> WebhookSourceStep<R> from() {
         return new WebhookSourceStep<>();
     }
 
@@ -24,6 +22,7 @@ public interface WebhookCrawlerStrategy<R, T extends Event> extends CrawlerStrat
     class WebhookBuilder<R, T extends Event> {
         private final EventDeserializer<R, T> deserializer;
         private Consumer<T> onEvent = event -> {};
+        private Consumer<Exception> onError = e -> {};
 
         private WebhookBuilder(EventDeserializer<R, T> deserializer) {
             this.deserializer = deserializer;
@@ -34,12 +33,28 @@ public interface WebhookCrawlerStrategy<R, T extends Event> extends CrawlerStrat
             return this;
         }
 
+        public WebhookBuilder<R, T> onError(Consumer<Exception> onError) {
+            this.onError = onError;
+            return this;
+        }
+
         public WebhookCrawlerStrategy<R, T> build() {
             EventBuffer<T> buffer = EventBuffer.initialize();
             Consumer<T> handler = event -> { buffer.push(event); onEvent.accept(event); };
-            return new WebhookCrawlerStrategy<R, T>() {
-                @Override public void receive(R raw) { handler.accept(deserializer.deserialize(raw)); }
-                @Override public Stream<T> crawl()   { return buffer.drain(); }
+            return new WebhookCrawlerStrategy<>() {
+                @Override
+                public void receive(R raw) {
+                    try {
+                        handler.accept(deserializer.deserialize(raw));
+                    } catch (Exception e) {
+                        onError.accept(e);
+                    }
+                }
+
+                @Override
+                public Stream<T> collect() {
+                    return buffer.drain();
+                }
             };
         }
     }
