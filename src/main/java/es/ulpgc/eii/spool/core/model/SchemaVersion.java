@@ -1,4 +1,4 @@
-package es.ulpgc.eii.spool;
+package es.ulpgc.eii.spool.core.model;
 
 public record SchemaVersion(String value) {
 
