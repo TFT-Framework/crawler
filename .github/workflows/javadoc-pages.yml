@@ -26,9 +26,17 @@ jobs:
           mkdir -p doc
           mvn javadoc:javadoc -DoutputDirectory=doc -Dquiet=true -DskipTests
 
-      - name: Deploy doc/ to GitHub Pages
+      - name: Create .nojekyll (disable Jekyll)
+        run: touch doc/.nojekyll
+
+      - name: Debug doc contents
+        run: ls -la doc/
+
+      - name: Deploy doc/ to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc
           publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy Javadoc $(date)"
