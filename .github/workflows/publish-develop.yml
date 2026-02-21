@@ -23,4 +23,4 @@ jobs:
       - name: Publish to GitHub Packages
         run: mvn deploy -B --no-transfer-progress -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}  # ← PAT MÁGICO
+          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}
