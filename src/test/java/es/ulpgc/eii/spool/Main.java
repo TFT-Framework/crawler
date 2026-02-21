@@ -9,12 +9,11 @@ public class Main {
     public static void main(String[] args) {
         try (EventSource<ConcreteExample> stream = StreamCrawlerStrategy
                 .from(new ConcreteCrawlerSource())
+                .withPlatformBus(System.out::println)
                 .deserializeWith(new ConcreteEventDeserializer())
-                .onEvent(e -> System.out.println("Event received at " + LocalDateTime.now()))
-                .onError(e -> System.out.println("Error on: " + e + " at " + LocalDateTime.now()))
                 .build()
         ) {
-            stream.open().collect().forEach(System.out::println);
+            stream.open().collect();
         }
     }
 }

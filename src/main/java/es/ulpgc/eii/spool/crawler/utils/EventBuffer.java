@@ -1,6 +1,6 @@
 package es.ulpgc.eii.spool.crawler.utils;
 
-import es.ulpgc.eii.spool.core.model.Event;
+import es.ulpgc.eii.spool.core.model.DomainEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +8,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
-public final class EventBuffer<T extends Event> {
+public final class EventBuffer<T extends DomainEvent> {
     private final Queue<T> buffer = new ConcurrentLinkedQueue<>();
 
     private EventBuffer() {}
 
-    public static <T extends Event> EventBuffer<T> initialize() {
+    public static <T extends DomainEvent> EventBuffer<T> initialize() {
         return new EventBuffer<>();
     }
 

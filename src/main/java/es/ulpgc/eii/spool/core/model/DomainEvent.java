@@ -2,7 +2,7 @@ package es.ulpgc.eii.spool.core.model;
 
 import java.time.Instant;
 
-public interface Event {
+public interface DomainEvent {
     String id();
     String correlationId();
     String idempotencyKey();

@@ -20,9 +20,6 @@ public class ConcreteCrawlerSource implements StreamSource<ConcreteExampleDTO> {
     public void start(Consumer<ConcreteExampleDTO> onMessage, Consumer<Exception> onError) {
         examples.forEach(e -> {
             try {
-                if (e.id().toString().endsWith("f")) {
-                    throw new RuntimeException("Simulated deserialization error for: " + e.id());
-                }
                 onMessage.accept(e);
             } catch (Exception ex) {
                 onError.accept(ex);

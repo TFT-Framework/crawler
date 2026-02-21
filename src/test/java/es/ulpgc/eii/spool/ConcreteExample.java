@@ -1,12 +1,12 @@
 package es.ulpgc.eii.spool;
 
-import es.ulpgc.eii.spool.core.model.Event;
+import es.ulpgc.eii.spool.core.model.DomainEvent;
 import es.ulpgc.eii.spool.core.model.EventCategory;
 import es.ulpgc.eii.spool.core.model.SchemaVersion;
 
 import java.time.Instant;
 
-public record ConcreteExample(String id) implements Event {
+public record ConcreteExample(String id) implements DomainEvent {
     @Override
     public String correlationId() {
         return "";
@@ -14,7 +14,7 @@ public record ConcreteExample(String id) implements Event {
 
     @Override
     public String idempotencyKey() {
-        return "";
+        return id;
     }
 
     @Override
