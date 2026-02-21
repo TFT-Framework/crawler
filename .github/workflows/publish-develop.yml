@@ -7,7 +7,6 @@ on:
 permissions:
   packages: write
   contents: read
-  id-token: write  # ← AÑADIDO para OIDC auth
 
 jobs:
   publish:
@@ -24,4 +23,4 @@ jobs:
       - name: Publish to GitHub Packages
         run: mvn deploy -B --no-transfer-progress -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PKG_TOKEN }}  # ← PAT MÁGICO
