@@ -10,9 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class PullCrawlerBuilder<R, T extends DomainEvent>
-        extends BaseCrawlerBuilder<R, T, PullCrawlerBuilder<R, T>> {
-
+public class PullCrawlerBuilder<R, T extends DomainEvent> extends BaseCrawlerBuilder<R, T, PullCrawlerBuilder<R, T>> {
     private final CrawlerSource<R> source;
 
     public PullCrawlerBuilder(PlatformEventSource platformBus, CrawlerSource<R> source, EventDeserializer<R, T> deserializer) {
@@ -20,7 +18,7 @@ public class PullCrawlerBuilder<R, T extends DomainEvent>
         this.source = source;
     }
 
-    public PullCrawlerStrategy<T> build() {
+    public PullCrawlerStrategy<T> createSource() {
         return () -> {
             platformBus.emit(SourceStarted.of(SourceType.PULL));
             Set<T> seen = new HashSet<>();

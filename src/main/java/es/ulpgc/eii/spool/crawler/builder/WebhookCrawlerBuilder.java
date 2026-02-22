@@ -9,14 +9,13 @@ import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class WebhookBuilder<R, T extends DomainEvent>
-        extends BufferedCrawlerBuilder<R, T, WebhookBuilder<R, T>> {
+public class WebhookCrawlerBuilder<R, T extends DomainEvent> extends BufferedCrawlerBuilder<R, T, WebhookCrawlerBuilder<R, T>> {
 
-    public WebhookBuilder(PlatformEventSource platformBus, EventDeserializer<R, T> deserializer) {
+    public WebhookCrawlerBuilder(PlatformEventSource platformBus, EventDeserializer<R, T> deserializer) {
         super(platformBus, deserializer);
     }
 
-    public WebhookCrawlerStrategy<R, T> build() {
+    public WebhookCrawlerStrategy<R, T> createSource() {
         EventBuffer<T> buffer = EventBuffer.initialize();
         Consumer<R> handler = consumerWith(buffer, SourceType.WEBHOOK);
         return new WebhookCrawlerStrategy<>() {

@@ -12,9 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class StreamCrawlerBuilder<R, T extends DomainEvent>
-        extends BufferedCrawlerBuilder<R, T, StreamCrawlerBuilder<R, T>> {
-
+public class StreamCrawlerBuilder<R, T extends DomainEvent> extends BufferedCrawlerBuilder<R, T, StreamCrawlerBuilder<R, T>> {
     private final StreamSource<R> source;
 
     public StreamCrawlerBuilder(PlatformEventSource platformBus, StreamSource<R> source, EventDeserializer<R, T> deserializer) {
@@ -22,7 +20,7 @@ public class StreamCrawlerBuilder<R, T extends DomainEvent>
         this.source = source;
     }
 
-    public StreamCrawlerStrategy<T> build() {
+    public StreamCrawlerStrategy<T> createSource() {
         EventBuffer<T> buffer = EventBuffer.initialize();
         Consumer<R> handler = consumerWith(buffer, SourceType.STREAM);
         AtomicBoolean closed = new AtomicBoolean(true);

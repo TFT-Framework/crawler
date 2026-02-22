@@ -9,7 +9,7 @@ public class Main {
                 .stream(new ConcreteCrawlerSource())
                 .withPlatformBus(System.out::println)
                 .deserializeWith(new ConcreteEventDeserializer())
-                .build()
+                .createSource()
         ) {
             stream.open().collect();
         }
