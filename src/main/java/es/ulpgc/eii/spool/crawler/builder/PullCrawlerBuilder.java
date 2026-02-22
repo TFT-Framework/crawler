@@ -22,7 +22,18 @@ public class PullCrawlerBuilder<R, T extends DomainEvent> extends BaseCrawlerBui
         return () -> {
             platformBus.emit(SourceStarted.of(SourceType.PULL));
             Set<T> seen = new HashSet<>();
-            return source.read()
+            try {
+                return readWith(seen);
+            } catch (Exception e) {
+                platformBus.emit(SourceStopped.of(SourceType.PULL, e.getMessage()));
+                onError.accept(e);
+                return Stream.empty();
+            }
+        };
+    }
+
+    private Stream<T> readWith(Set<T> seen) {
+        return source.read()
                 .flatMap(r -> {
                     try {
                         T event = deserializer.deserialize(r);
@@ -37,6 +48,5 @@ public class PullCrawlerBuilder<R, T extends DomainEvent> extends BaseCrawlerBui
                         return Stream.empty();
                     }
                 });
-        };
     }
 }

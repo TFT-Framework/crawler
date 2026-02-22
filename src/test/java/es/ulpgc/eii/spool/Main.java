@@ -11,7 +11,7 @@ public class Main {
                 .deserializeWith(new ConcreteEventDeserializer())
                 .createSource()
         ) {
-            stream.open().collect();
+            stream.open();
         }
     }
 }
