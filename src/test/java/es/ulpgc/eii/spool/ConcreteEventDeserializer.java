@@ -1,6 +1,6 @@
 package es.ulpgc.eii.spool;
 
-import es.ulpgc.eii.spool.crawler.utils.EventDeserializer;
+import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
 
 public class ConcreteEventDeserializer implements EventDeserializer<ConcreteExampleDTO, ConcreteExample> {
     @Override

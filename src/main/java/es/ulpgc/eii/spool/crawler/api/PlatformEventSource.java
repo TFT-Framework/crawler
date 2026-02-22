@@ -1,4 +1,4 @@
-package es.ulpgc.eii.spool.crawler.source;
+package es.ulpgc.eii.spool.crawler.api;
 
 import es.ulpgc.eii.spool.core.model.PlatformEvent;
 

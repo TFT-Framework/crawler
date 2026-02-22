@@ -1,6 +1,6 @@
 package es.ulpgc.eii.spool;
 
-import es.ulpgc.eii.spool.crawler.source.StreamSource;
+import es.ulpgc.eii.spool.crawler.api.source.StreamSource;
 
 import java.util.ArrayList;
 import java.util.List;
