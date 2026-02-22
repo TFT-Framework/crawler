@@ -54,15 +54,22 @@ Add the dependency to your `pom.xml`:
 
 ## Core Concepts
 
-| Class / Interface         | Role                                                                   |
-|---------------------------|------------------------------------------------------------------------|
-| `Event`                   | Base interface every domain event must implement                       |
-| `EventBuffer<T>`          | Thread-safe in-memory queue; holds events until `drain()` is called    |
-| `EventCategory`           | Enum — `PLATFORM` or `DOMAIN`                                          |
-| `SchemaVersion`           | Semver-validated record (e.g. `"1.0.0"`)                               |
-| `CrawlerSource<R>`        | Read-side abstraction for Pull sources — returns `Stream<R>`           |
-| `StreamSource<R>`         | Push-side abstraction for Stream sources — `start()` / `stop()`        |
-| `EventDeserializer<R, T>` | Converts a raw payload `R` into a typed `Event` subtype `T`            |
+| Class / Interface           | Role                                                                |
+|-----------------------------|---------------------------------------------------------------------|
+| `PlatformEvent`             | Interface that every platform event implements                      |
+| `DomainEvent`               | Base interface every domain event must implement                    |
+| `EventBuffer<T>`            | Thread-safe in-memory queue; holds events until `drain()` is called |
+| `SourceType`                | Enum — `PULL`, `STREAM`, `WEBHOOK`                                  |
+| `EventCategory`             | Enum — `PLATFORM` or `DOMAIN`                                       |
+| `SchemaVersion`             | Semver-validated record (e.g. `"1.0.0"`)                            |
+| `CrawlerSource<R>`          | Read-side abstraction for Pull sources — returns `Stream<R>`        |
+| `StreamSource<R>`           | Push-side abstraction for Stream sources — `start()` / `stop()`     |
+| `EventSource<R>`            | Abstractions for every source                                       |
+| `PlatformEventSource`       | Abstractions for every source of platform events                    |
+| `PullCrawlerStrategy<T>`    | Strategy abstraction for pull sources                               |
+| `StreamCrawlerStrategy<T>`  | Strategy abstraction for stream sources                             |
+| `WebhookCrawlerStrategy<T>` | Strategy abstraction for webhook sources                            |
+| `EventDeserializer<R, T>`   | Converts a raw payload `R` into a typed `Event` subtype `T`         |
 
 ---
 
@@ -70,7 +77,7 @@ Add the dependency to your `pom.xml`:
 
 ### 1. Define your Event
 
-Implement the `Event` interface for your domain:
+Implement the `DomainEvent` interface for your domain:
 
 ```java
 public record ParkingEvent(
@@ -81,7 +88,7 @@ public record ParkingEvent(
     int freeSpots,
     String status,
     Instant occurredAt
-) implements Event {
+) implements DomainEvent {
 
     @Override public EventCategory eventCategory() { return EventCategory.DOMAIN; }
     @Override public String eventType()            { return "parking.occupancy.updated"; }
@@ -99,17 +106,19 @@ Use `PullCrawlerStrategy` to poll a source on demand (REST API, database, file, 
 // 1. Implement CrawlerSource — fetches raw data from your source
 CrawlerSource<String> apiSource = () -> httpClient.getLines("/api/parking/occupancy"); // returns Stream<String>
 
-// 2. Implement EventDeserializer — maps raw data to your Event
+// 2. Implement EventDeserializer — maps raw data to your DomainEvent
 EventDeserializer<String, ParkingEvent> deserializer = raw -> JsonMapper.parse(raw, ParkingEvent.class);
 
 // 3. Build the strategy (fluent API)
 PullCrawlerStrategy<ParkingEvent> strategy = PullCrawlerStrategy
     .from(apiSource)
+    .onError(e -> System.out.println("An error occurred"))
     .deserializeWith(deserializer);
+    .onEvent(e -> System.out.println("Event received: " + e.id()))
+    .build();
 
-// 4. Crawl — returns a Stream<ParkingEvent>
-strategy.crawl()
-    .forEach(e -> System.out.println(e.lotId() + " → " + e.freeSpots() + " free spots"));
+// 4. Collect — returns a Stream<ParkingEvent>
+strategy.collect().forEach(e -> System.out.println(e.lotId() + " → " + e.freeSpots() + " free spots"));
 ```
 
 ---
