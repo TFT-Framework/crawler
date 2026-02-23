@@ -34,21 +34,24 @@ public class PullCrawlerBuilder<R, T extends DomainEvent> extends BaseCrawlerBui
 
     private List<T> readAll() {
         Set<String> seenKeys = new HashSet<>();
-        return source.read()
+        Stream<R> stream;
+        try {
+            stream = source.read();
+        } catch (Exception e) {
+            errorRouter.dispatch(e);
+            return List.of();
+        }
+        return stream
                 .flatMap(r -> toEvent(r, seenKeys))
                 .toList();
     }
 
+
     private Stream<T> toEvent(R r, Set<String> seenKeys) {
-        try {
-            T event = deserializer.deserialize(r);
-            if (!seenKeys.add(event.idempotencyKey())) throw new DuplicateEventException(event.idempotencyKey());
-            platformBus.emit(EventReceived.of(event.correlationId(), SourceType.PULL, getPayloadSize(r)));
-            onEvent.accept(event);
-            return Stream.of(event);
-        } catch (Exception e) {
-            errorRouter.dispatch(e);
-            return Stream.empty();
-        }
+        T event = deserializer.deserialize(r);
+        if (!seenKeys.add(event.idempotencyKey())) throw new DuplicateEventException(event.idempotencyKey());
+        platformBus.emit(EventReceived.of(event.correlationId(), SourceType.PULL, getPayloadSize(r)));
+        onEvent.accept(event);
+        return Stream.of(event);
     }
 }
