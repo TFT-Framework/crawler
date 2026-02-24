@@ -2,7 +2,7 @@ name: Publish to TFT-Framework Packages
 on:
   push:
     branches: [ develop ]
-    tags: [ 'v*.*.*-dev' ]
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]-SNAPSHOT' ]
   workflow_dispatch:
 
 permissions:
