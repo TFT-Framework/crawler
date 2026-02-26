@@ -1,7 +1,5 @@
 package es.ulpgc.eii.spool.crawler.internal.utils;
 
-import es.ulpgc.eii.spool.core.model.DomainEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;

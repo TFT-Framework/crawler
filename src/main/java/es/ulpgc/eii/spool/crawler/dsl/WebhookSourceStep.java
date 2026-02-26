@@ -1,6 +1,5 @@
 package es.ulpgc.eii.spool.crawler.dsl;
 
-import es.ulpgc.eii.spool.core.model.DomainEvent;
 import es.ulpgc.eii.spool.crawler.builder.WebhookCrawlerBuilder;
 import es.ulpgc.eii.spool.crawler.api.PlatformEventSource;
 import es.ulpgc.eii.spool.crawler.api.EventDeserializer;

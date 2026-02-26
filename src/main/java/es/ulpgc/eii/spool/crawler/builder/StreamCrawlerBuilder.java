@@ -2,9 +2,8 @@ package es.ulpgc.eii.spool.crawler.builder;
 
 import es.ulpgc.eii.spool.core.model.*;
 import es.ulpgc.eii.spool.crawler.api.PlatformEventSource;
-import es.ulpgc.eii.spool.crawler.api.source.StreamSource;
 import es.ulpgc.eii.spool.crawler.api.EventSource;
-import es.ulpgc.eii.spool.crawler.api.strategy.StreamCrawlerStrategy;
+import es.ulpgc.eii.spool.crawler.api.source.StreamEventSource;
 import es.ulpgc.eii.spool.crawler.internal.utils.EventBuffer;
 import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
 import es.ulpgc.eii.spool.crawler.internal.utils.ExceptionRouter;
@@ -24,11 +23,11 @@ public class StreamCrawlerBuilder<R, T extends DomainEvent> extends BufferedCraw
     }
 
     //TODO separate method to gain readability
-    public StreamCrawlerStrategy<T> createSource() {
+    public StreamEventSource<T> createSource() {
         EventBuffer<T> buffer = EventBuffer.initialize();
         Consumer<R> handler = consumerWith(buffer, errorRouter, SourceType.STREAM);
         AtomicBoolean closed = new AtomicBoolean(true);
-        return new StreamCrawlerStrategy<T>() {
+        return new StreamEventSource<T>() {
             @Override
             public Stream<T> collect() {
                 if (closed.get()) throw new IllegalStateException("Call open() first");

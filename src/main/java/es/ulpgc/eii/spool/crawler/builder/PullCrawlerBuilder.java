@@ -2,7 +2,6 @@ package es.ulpgc.eii.spool.crawler.builder;
 
 import es.ulpgc.eii.spool.core.model.*;
 import es.ulpgc.eii.spool.crawler.api.exception.DuplicateEventException;
-import es.ulpgc.eii.spool.crawler.api.source.CrawlerSource;
 import es.ulpgc.eii.spool.crawler.api.PlatformEventSource;
 import es.ulpgc.eii.spool.crawler.api.strategy.PullCrawlerStrategy;
 import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
@@ -45,7 +44,6 @@ public class PullCrawlerBuilder<R, T extends DomainEvent> extends BaseCrawlerBui
                 .flatMap(r -> toEvent(r, seenKeys))
                 .toList();
     }
-
 
     private Stream<T> toEvent(R r, Set<String> seenKeys) {
         T event = deserializer.deserialize(r);

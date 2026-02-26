@@ -2,7 +2,7 @@ package es.ulpgc.eii.spool.crawler.builder;
 
 import es.ulpgc.eii.spool.core.model.*;
 import es.ulpgc.eii.spool.crawler.api.PlatformEventSource;
-import es.ulpgc.eii.spool.crawler.api.strategy.WebhookCrawlerStrategy;
+import es.ulpgc.eii.spool.crawler.api.source.WebhookEventSource;
 import es.ulpgc.eii.spool.crawler.internal.utils.EventBuffer;
 import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
 import es.ulpgc.eii.spool.crawler.internal.utils.ExceptionRouter;
@@ -19,10 +19,10 @@ public class WebhookCrawlerBuilder<R, T extends DomainEvent> extends BufferedCra
     }
 
     //TODO handle errors
-    public WebhookCrawlerStrategy<R, T> createSource() {
+    public WebhookEventSource<R, T> createSource() {
         EventBuffer<T> buffer = EventBuffer.initialize();
         Consumer<R> handler = consumerWith(buffer, errorRouter, SourceType.WEBHOOK);
-        return new WebhookCrawlerStrategy<>() {
+        return new WebhookEventSource<>() {
             @Override public void receive(R raw) {handler.accept(raw);}
             @Override public Stream<T> collect() {
                 return buffer.drain();

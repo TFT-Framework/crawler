@@ -2,24 +2,21 @@ package es.ulpgc.eii.spool.crawler.builder;
 
 import es.ulpgc.eii.spool.core.model.*;
 import es.ulpgc.eii.spool.crawler.api.PlatformEventSource;
-import es.ulpgc.eii.spool.crawler.api.EventDeserializer;
-import es.ulpgc.eii.spool.crawler.api.exception.DeserializationException;
-import es.ulpgc.eii.spool.crawler.api.exception.DuplicateEventException;
+import es.ulpgc.eii.spool.crawler.api.SourceSplitter;
 import es.ulpgc.eii.spool.crawler.internal.utils.ExceptionRouter;
 
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
-public abstract class BaseCrawlerBuilder<R, T extends DomainEvent, SELF extends BaseCrawlerBuilder<R, T, SELF>> {
+public abstract class BaseCrawlerBuilder<R, SELF extends BaseCrawlerBuilder<R, SELF>> {
 
     protected final PlatformEventSource platformBus;
-    protected final EventDeserializer<R, T> deserializer;
+    protected final SourceSplitter<> serializer;
     protected Consumer<T> onEvent = e -> {};
     protected Consumer<Exception> onError = e -> {};
 
-    protected BaseCrawlerBuilder(PlatformEventSource platformBus, EventDeserializer<R, T> deserializer) {
+    protected BaseCrawlerBuilder(PlatformEventSource platformBus, SourceSplitter<R> serializer) {
         this.platformBus = platformBus;
-        this.deserializer = deserializer;
+        this.serializer = serializer;
     }
 
     @SuppressWarnings("unchecked")
@@ -33,7 +30,8 @@ public abstract class BaseCrawlerBuilder<R, T extends DomainEvent, SELF extends 
     }
 
     protected ExceptionRouter buildRouter(SourceType sourceType) {
-        return new ExceptionRouter()
+        return new ExceptionRouter();
+        /*
                 .on(DeserializationException.class, e -> {
                     platformBus.emit(EventDeserializationFailed.of(e.rawPayload(), e.getMessage(), sourceType));
                     onError.accept(e);
@@ -44,5 +42,6 @@ public abstract class BaseCrawlerBuilder<R, T extends DomainEvent, SELF extends 
                     platformBus.emit(SourceStopped.of(sourceType, e.getMessage()));
                     onError.accept(e);
                 });
+         */
     }
 }

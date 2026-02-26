@@ -1,6 +1,5 @@
 package es.ulpgc.eii.spool;
 
-import es.ulpgc.eii.spool.core.model.DomainEvent;
 import es.ulpgc.eii.spool.core.model.EventCategory;
 import es.ulpgc.eii.spool.core.model.SchemaVersion;
 
