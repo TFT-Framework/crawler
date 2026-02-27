@@ -1,11 +1,11 @@
 package es.ulpgc.eii.gemini.application;
 
 import es.ulpgc.eii.gemini.application.crawler.GeminiTradeCrawlerSource;
-import es.ulpgc.eii.spool.crawler.api.source.Inbox;
-import es.ulpgc.eii.spool.crawler.api.strategy.CrawlerStrategy;
-import es.ulpgc.eii.spool.crawler.dsl.Crawlers;
-import es.ulpgc.eii.spool.crawler.internal.utils.Formats;
-import es.ulpgc.eii.spool.crawler.internal.utils.JdbcInbox;
+import software.spool.crawler.api.source.Inbox;
+import software.spool.crawler.api.strategy.CrawlerStrategy;
+import software.spool.crawler.dsl.Crawlers;
+import software.spool.crawler.internal.utils.Formats;
+import software.spool.crawler.internal.utils.JdbcInbox;
 
 public class Application {
     private final CrawlerStrategy crawler;

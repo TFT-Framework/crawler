@@ -1,7 +1,7 @@
 package es.ulpgc.eii.gemini.application.crawler;
 
-import es.ulpgc.eii.spool.crawler.api.exception.SpoolException;
-import es.ulpgc.eii.spool.crawler.api.source.PullSource;
+import software.spool.crawler.api.exception.SpoolException;
+import software.spool.crawler.api.source.PullSource;
 
 import java.net.URI;
 import java.net.http.HttpClient;
