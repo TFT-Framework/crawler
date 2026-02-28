@@ -1,6 +1,6 @@
 package software.spool.crawler.internal.port;
 
-import software.spool.crawler.api.exception.SpoolException;
+import software.spool.core.exception.SpoolException;
 
 import java.util.stream.Stream;
 

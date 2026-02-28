@@ -1,7 +1,7 @@
 package software.spool.crawler.internal.utils.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import software.spool.crawler.api.exception.SourceSplitException;
+import software.spool.core.exception.SourceSplitException;
 import software.spool.crawler.internal.port.SourceSplitter;
 
 import java.sql.ResultSet;

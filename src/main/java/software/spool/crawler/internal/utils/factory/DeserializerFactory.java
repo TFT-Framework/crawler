@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import software.spool.crawler.internal.port.SourceDeserializer;
-import software.spool.crawler.api.exception.DeserializationException;
+import software.spool.core.exception.DeserializationException;
 
 import java.util.LinkedHashMap;
 import java.util.List;

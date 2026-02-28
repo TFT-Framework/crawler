@@ -1,13 +1,9 @@
 package software.spool.crawler.api.strategy;
 
 import software.spool.crawler.api.ErrorRouter;
-import software.spool.crawler.api.exception.InboxWriteException;
-import software.spool.crawler.api.exception.SourceOpenException;
-import software.spool.crawler.api.exception.SourcePollException;
-import software.spool.crawler.api.exception.SpoolException;
+import software.spool.core.exception.*;
 import software.spool.crawler.api.port.EventBus;
-import software.spool.model.InboxFailed;
-import software.spool.model.SourceFailed;
+import software.spool.core.model.*;
 
 import java.util.Objects;
 

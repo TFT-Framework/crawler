@@ -1,7 +1,7 @@
 package software.spool.crawler.internal.utils;
 
-import software.spool.model.RawDataReadFromSource;
-import software.spool.crawler.api.exception.SpoolException;
+import software.spool.core.model.RawDataReadFromSource;
+import software.spool.core.exception.SpoolException;
 import software.spool.crawler.api.port.InboxEntryId;
 import software.spool.crawler.api.port.InboxWriter;
 

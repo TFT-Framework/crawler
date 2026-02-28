@@ -1,8 +1,8 @@
 package software.spool.crawler.api.source;
 
-import software.spool.model.RawDataReadFromSource;
+import software.spool.core.model.RawDataReadFromSource;
 import software.spool.crawler.internal.port.Source;
-import software.spool.crawler.api.exception.SpoolException;
+import software.spool.core.exception.SpoolException;
 
 import java.util.function.Consumer;
 

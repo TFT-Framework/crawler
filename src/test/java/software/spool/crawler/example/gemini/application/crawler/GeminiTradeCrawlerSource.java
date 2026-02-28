@@ -1,7 +1,6 @@
 package software.spool.crawler.example.gemini.application.crawler;
 
-import software.spool.crawler.api.exception.SourcePollException;
-import software.spool.crawler.api.exception.SpoolException;
+import software.spool.core.exception.*;
 import software.spool.crawler.api.source.PollSource;
 
 import java.net.URI;

@@ -1,13 +1,12 @@
 package software.spool.crawler.internal.strategy;
 
-import software.spool.crawler.api.exception.*;
+import software.spool.core.exception.*;
 import software.spool.crawler.api.port.InboxEntryId;
 import software.spool.crawler.api.strategy.BaseCrawlerStrategy;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
 import software.spool.crawler.internal.utils.CrawlerPorts;
 import software.spool.crawler.internal.utils.factory.Transformer;
-import software.spool.model.RawDataWrittenToInbox;
-import software.spool.model.RawDataReadFromSource;
+import software.spool.core.model.*;
 import software.spool.crawler.api.source.PollSource;
 
 import java.util.stream.Stream;

@@ -1,11 +1,10 @@
 package software.spool.crawler.internal.utils;
 
-import software.spool.crawler.api.exception.InboxWriteException;
+import software.spool.core.exception.InboxWriteException;
 import software.spool.crawler.api.port.InboxEntryId;
 import software.spool.crawler.api.port.InboxWriter;
-import software.spool.model.RawDataReadFromSource;
+import software.spool.core.model.RawDataReadFromSource;
 
-import java.lang.RuntimeException;
 import java.sql.*;
 
 public class JdbcInboxWriter implements InboxWriter {
