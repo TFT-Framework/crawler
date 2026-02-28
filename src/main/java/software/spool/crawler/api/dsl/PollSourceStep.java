@@ -40,6 +40,7 @@ public class PollSourceStep<R, T, O> {
     public <NT, NO> PollSourceStep<R, NT, NO> withFormat(ProcessorFormat<R, NT, NO> format) {
         Transformer<R, NT, NO> pipeline = format.pipeline();
         return new PollSourceStep<R, NT, NO>(source, ports)
+                .senderName(sender)
                 .transformer(pipeline);
     }
 }
