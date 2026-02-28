@@ -14,7 +14,7 @@
 
     <groupId>software.spool</groupId>
     <artifactId>crawler</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
