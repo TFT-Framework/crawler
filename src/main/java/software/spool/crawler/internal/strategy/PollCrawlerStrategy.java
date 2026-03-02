@@ -9,8 +9,6 @@ import software.spool.crawler.internal.utils.factory.Transformer;
 import software.spool.core.model.*;
 import software.spool.crawler.api.source.PollSource;
 
-import java.util.stream.Stream;
-
 public class PollCrawlerStrategy<R, T, O> extends BaseCrawlerStrategy implements CrawlerStrategy {
     private final PollSource<R> source;
     private final Transformer<R, T, O> transformer;
@@ -28,47 +26,18 @@ public class PollCrawlerStrategy<R, T, O> extends BaseCrawlerStrategy implements
     @Override
     public void execute() throws SpoolException {
         try (PollSource<R> source = this.source.open()) {
-            safeSplit(safeDeserialize(safePoll(source)), sender).forEach(r -> safeProcess(r, sender));
+            transformer.splitter().split(transformer.deserializer().deserialize(source.poll()), source.sourceId())
+                    .forEach(e -> process(e, sender));
         } catch (Exception e) {
             errorRouter.dispatch(e);
         }
     }
 
-    private R safePoll(PollSource<R> source) {
+    private void process(O record, String sender) {
         try {
-            return source.poll();
-        } catch (SourcePollException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new SourcePollException("Error while polling from source: " + source.sourceId(), e);
-        }
-    }
-
-    private T safeDeserialize(R raw) {
-        try {
-            return transformer.deserializer().deserialize(raw);
-        } catch (DeserializationException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DeserializationException("Unexpected error in deserializer", e);
-        }
-    }
-
-    private Stream<O> safeSplit(T deserialized, String sender) {
-        try {
-            return transformer.splitter().split(deserialized, sender);
-        } catch (SourceSplitException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new SourceSplitException("Unexpected error in splitter", String.valueOf(deserialized), e);
-        }
-    }
-
-    private void safeProcess(O record, String sender) {
-        try {
-            String payload = safeSerialize(record, sender);
+            String payload = serialize(record, sender);
             ports.bus().emit(RawDataWrittenToInbox.from(sender)
-                    .withIdempotencyKey(safeWrite(payload, sender).value())
+                    .withIdempotencyKey(writeToInbox(payload).value())
                     .withPayload(payload)
                     .create());
         } catch (SpoolException e) {
@@ -76,26 +45,14 @@ public class PollCrawlerStrategy<R, T, O> extends BaseCrawlerStrategy implements
         }
     }
 
-    private String safeSerialize(O record, String sender) {
-        try {
-            return transformer.serializer().serialize(record, sender);
-        } catch (SerializationException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new SerializationException("Unexpected error in serializer", String.valueOf(record), e);
-        }
+    private String serialize(O record, String sender) {
+        return transformer.serializer().serialize(record, sender);
     }
 
-    private InboxEntryId safeWrite(String payload, String sender) {
-        try {
-            return ports.inboxWriter().receive(RawDataReadFromSource.builder()
-                    .payload(payload)
-                    .sender(this.sender)
-                    .build());
-        } catch (InboxWriteException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new InboxWriteException("Unexpected error writing to inbox: " + e.getMessage(), e);
-        }
+    private InboxEntryId writeToInbox(String payload) {
+        return ports.inboxWriter().receive(RawDataReadFromSource.builder()
+                .payload(payload)
+                .sender(sender)
+                .build());
     }
 }
