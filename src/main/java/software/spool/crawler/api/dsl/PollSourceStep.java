@@ -6,6 +6,7 @@ import software.spool.crawler.api.port.EventBusEmitter;
 import software.spool.crawler.api.port.InboxWriter;
 import software.spool.crawler.api.source.PollSource;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
+import software.spool.crawler.internal.decorator.*;
 import software.spool.crawler.internal.strategy.PollCrawlerStrategy;
 import software.spool.crawler.internal.utils.CrawlerPorts;
 import software.spool.crawler.internal.utils.factory.Transformer;
@@ -20,12 +21,16 @@ public class PollSourceStep<R, T, O> {
     private String sender;
 
     public PollSourceStep(PollSource<R> source, CrawlerPorts ports) {
-        this.source = source;
+        this.source = SafePollSource.of(source);
         this.ports = ports;
     }
 
     public PollSourceStep<R, T, O> transformer(Transformer<R, T, O> transformer) {
-        this.transformer = transformer;
+        this.transformer = Transformer.of(
+                SafeSourceDeserializer.of(transformer.deserializer()),
+                SafeSourceSplitter.of(transformer.splitter()),
+                SafeSourceSerializer.of(transformer.serializer())
+        );
         return this;
     }
 
@@ -56,8 +61,8 @@ public class PollSourceStep<R, T, O> {
 
     private CrawlerPorts getPorts(EventBusEmitter bus, InboxWriter inboxWriter, ErrorRouter errorRouter) {
         return CrawlerPorts.builder()
-                .bus(bus)
-                .inbox(inboxWriter)
+                .bus(SafeEventBusEmitterEmitter.of(bus))
+                .inbox(SafeInboxWriter.of(inboxWriter))
                 .errorRouter(errorRouter)
                 .build();
     }
