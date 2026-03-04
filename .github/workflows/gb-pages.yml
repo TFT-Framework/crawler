@@ -37,22 +37,20 @@ jobs:
           </settings>
           EOF
 
-      - name: Generate Javadoc → doc/
-        run: |
-          mkdir -p doc
-          mvn javadoc:javadoc -DoutputDirectory=doc -Dquiet=true -DskipTests
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc -Dquiet=true -DskipTests
 
       - name: Create .nojekyll (disable Jekyll)
-        run: touch doc/.nojekyll
+        run: touch target/reports/apidocs/.nojekyll
 
       - name: Debug doc contents
-        run: ls -la doc/
+        run: ls -la target/reports/apidocs/
 
       - name: Deploy doc/ to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc
+          publish_dir: ./target/reports/apidocs
           publish_branch: gh-pages
           force_orphan: true
           commit_message: "Deploy Javadoc"
