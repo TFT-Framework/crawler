@@ -21,7 +21,6 @@ import java.util.stream.Stream;
  * payload
  * ready for inbox storage.</li>
  * </ol>
- * </p>
  *
  * <p>
  * Pre-configured instances are available from {@link TransformerFactory}.

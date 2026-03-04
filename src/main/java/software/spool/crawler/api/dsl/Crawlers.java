@@ -29,7 +29,6 @@ import software.spool.crawler.internal.utils.InMemoryInboxWriter;
  * <li><b>inbox</b> – {@link InMemoryInboxWriter} (suitable for local
  * testing)</li>
  * </ul>
- * </p>
  */
 public final class Crawlers {
     private Crawlers() {

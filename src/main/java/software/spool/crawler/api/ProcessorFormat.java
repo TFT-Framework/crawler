@@ -17,7 +17,6 @@ import software.spool.crawler.internal.utils.factory.Transformer;
  * <li><b>Serialization</b> – converts each record {@code T} into a
  * {@code String} payload ready to be stored in the inbox.</li>
  * </ol>
- * </p>
  *
  * <p>
  * Pre-built formats are available in

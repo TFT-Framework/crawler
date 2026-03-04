@@ -25,7 +25,6 @@ import java.util.Objects;
  * {@code SourceItemCaptureFailed}</li>
  * <li>{@link InboxWriteException} → emits {@code InboxItemStoreFailed}</li>
  * </ul>
- * </p>
  *
  * <p>
  * Subclasses can supply a custom {@link ErrorRouter} to override or extend

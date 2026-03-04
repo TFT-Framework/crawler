@@ -24,6 +24,7 @@ import java.util.Map;
 public class InMemoryInboxWriter implements InboxWriter {
     private final Map<String, String> inbox;
 
+    /** Creates a new empty in-memory inbox. */
     public InMemoryInboxWriter() {
         inbox = new HashMap<>();
     }
