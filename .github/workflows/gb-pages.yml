@@ -8,7 +8,6 @@ permissions:
   contents: write
   pages: write
   id-token: write
-  packages: read
 
 jobs:
   deploy-docs:
@@ -22,35 +21,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Configure Maven credentials for GitHub Packages
+      - name: Generate Javadoc → doc/
         run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-
-      - name: Generate Javadoc
-        run: mvn javadoc:javadoc -Dquiet=true -DskipTests
+          mkdir -p doc
+          mvn javadoc:javadoc -DoutputDirectory=doc -Dquiet=true -DskipTests
 
       - name: Create .nojekyll (disable Jekyll)
-        run: touch target/reports/apidocs/.nojekyll
+        run: touch doc/.nojekyll
 
       - name: Debug doc contents
-        run: ls -la target/reports/apidocs/
+        run: ls -la doc/
 
       - name: Deploy doc/ to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/reports/apidocs
+          publish_dir: ./doc
           publish_branch: gh-pages
           force_orphan: true
           commit_message: "Deploy Javadoc"
