@@ -28,21 +28,19 @@ jobs:
           server-password: GITHUB_TOKEN
 
       - name: Generate Javadoc
-        run: |
-          mvn javadoc:javadoc -DskipTests -Dquiet=true \
-            -DreportOutputDirectory=. \
-            -Ddestdir=doc
+        run: mvn javadoc:javadoc -DskipTests -Dquiet=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Create .nojekyll
-        run: touch doc/.nojekyll
+        run: touch target/site/apidocs/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./doc
+          path: ./target/site/apidocs
+
 
       - name: Deploy to GitHub Pages
         id: deployment
