@@ -5,13 +5,16 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +27,7 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Generate Javadoc → doc/
+      - name: Generate Javadoc
         run: |
           mkdir -p doc
           mvn javadoc:javadoc -DoutputDirectory=doc -Dquiet=true -DskipTests
@@ -32,14 +35,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
-      - name: Create .nojekyll (disable Jekyll)
+      - name: Create .nojekyll
         run: touch doc/.nojekyll
 
-      - name: Deploy doc/ to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc
-          publish_branch: gh-pages
-          force_orphan: true
-          commit_message: "Deploy Javadoc"
+          path: ./doc
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
