@@ -1,6 +1,7 @@
 package software.spool.crawler.api.port;
 
 import software.spool.core.exception.SpoolException;
+import software.spool.crawler.internal.utils.factory.PayloadSplitterFactory;
 
 import java.util.stream.Stream;
 
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
  *
  * <p>
  * Pre-built implementations are available via
- * {@link software.spool.crawler.internal.utils.factory.SplitterFactory}.
+ * {@link PayloadSplitterFactory}.
  * </p>
  *
  * @param <I> the intermediate type produced by the deserializer

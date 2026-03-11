@@ -15,7 +15,7 @@ import java.util.Map;
  * All returned serializers are stateless and thread-safe.
  * </p>
  */
-public class SerializerFactory {
+public class RecordSerializerFactory {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**

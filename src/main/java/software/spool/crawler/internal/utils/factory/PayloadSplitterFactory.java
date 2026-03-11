@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
  * and can be safely reused across multiple executions.
  * </p>
  */
-public class SplitterFactory {
+public class PayloadSplitterFactory {
     /**
      * Returns a splitter that streams the elements of a {@link JsonNode} array.
      *

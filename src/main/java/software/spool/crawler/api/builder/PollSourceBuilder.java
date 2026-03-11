@@ -1,12 +1,22 @@
 package software.spool.crawler.api.builder;
 
+import software.spool.core.model.Event;
+import software.spool.core.model.IdempotencyKey;
+import software.spool.core.port.PayloadDeserializer;
+import software.spool.crawler.api.utils.DomainEventMapping;
 import software.spool.crawler.api.utils.ProcessorFormat;
 import software.spool.crawler.api.port.source.PollSource;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
 import software.spool.crawler.internal.decorator.*;
 import software.spool.crawler.internal.strategy.PollCrawlerStrategy;
 import software.spool.crawler.api.utils.CrawlerPorts;
+import software.spool.crawler.internal.utils.factory.DomainMapperFactory;
 import software.spool.crawler.internal.utils.factory.Transformer;
+import software.spool.crawler.api.utils.NamingConvention;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Fluent builder that configures a poll-based {@link CrawlerStrategy}.
@@ -24,14 +34,16 @@ import software.spool.crawler.internal.utils.factory.Transformer;
  * typed {@link software.spool.core.exception.SpoolException} subclasses.
  * </p>
  *
- * @param <R> the raw type returned by the configured {@link PollSource}
+ * @param <I> the raw type returned by the configured {@link PollSource}
  * @param <T> the intermediate type after deserialization
  * @param <O> the individual record type produced by the splitter
  */
-public class PollSourceBuilder<R, T, O> {
-    private final PollSource<R> source;
-    private Transformer<R, T, O> transformer;
+public class PollSourceBuilder<I, T, O> {
+    private final PollSource<I> source;
+    private Transformer<I, T, O> transformer;
     private CrawlerPorts ports;
+    private NamingConvention namingConvention;
+    private List<DomainEventMapping<?>> domainMappings;
 
     /**
      * Creates a new step wrapping the given source and ports.
@@ -43,13 +55,14 @@ public class PollSourceBuilder<R, T, O> {
      *
      * @param source the poll source; must not be {@code null}
      */
-    public PollSourceBuilder(PollSource<R> source) {
-        this.source = SafePollSource.of(source);
+    public PollSourceBuilder(PollSource<I> source) {
+        this(SafePollSource.of(source), null, new ArrayList<>());
     }
 
-    private PollSourceBuilder(PollSource<R> source, CrawlerPorts ports) {
+    private PollSourceBuilder(PollSource<I> source, CrawlerPorts ports, List<DomainEventMapping<?>> domainMappings) {
         this.source = SafePollSource.of(source);
         this.ports = ports;
+        this.domainMappings = domainMappings;
     }
 
     /**
@@ -65,7 +78,7 @@ public class PollSourceBuilder<R, T, O> {
      *                    must not be {@code null}
      * @return this step for chaining
      */
-    public PollSourceBuilder<R, T, O> transformer(Transformer<R, T, O> transformer) {
+    public PollSourceBuilder<I, T, O> transformer(Transformer<I, T, O> transformer) {
         this.transformer = Transformer.of(
                 SafePayloadDeserializer.of(transformer.deserializer()),
                 SafePayloadSplitter.of(transformer.splitter()),
@@ -79,7 +92,7 @@ public class PollSourceBuilder<R, T, O> {
      * @param ports the new ports; must not be {@code null}
      * @return this step for chaining
      */
-    public PollSourceBuilder<R, T, O> ports(CrawlerPorts ports) {
+    public PollSourceBuilder<I, T, O> ports(CrawlerPorts ports) {
         this.ports = ports;
         return this;
     }
@@ -90,7 +103,7 @@ public class PollSourceBuilder<R, T, O> {
      * @return a fully configured {@link CrawlerStrategy} ready to be executed
      */
     public CrawlerStrategy create() {
-        return new PollCrawlerStrategy<>(source, transformer, ports);
+        return new PollCrawlerStrategy<>(source, transformer, ports, domainMappings);
     }
 
     /**
@@ -107,9 +120,33 @@ public class PollSourceBuilder<R, T, O> {
      * @param format the processing format to apply; must not be {@code null}
      * @return a new {@link PollSourceBuilder} with the format applied
      */
-    public <NT, NO> PollSourceBuilder<R, NT, NO> withFormat(ProcessorFormat<R, NT, NO> format) {
-        Transformer<R, NT, NO> pipeline = format.pipeline();
-        return new PollSourceBuilder<R, NT, NO>(source, ports)
+    public <NT, NO> PollSourceBuilder<I, NT, NO> withFormat(ProcessorFormat<I, NT, NO> format) {
+        Transformer<I, NT, NO> pipeline = format.pipeline();
+        return new PollSourceBuilder<I, NT, NO>(source, ports, domainMappings)
                 .transformer(pipeline);
+    }
+
+    public PollSourceBuilder<I, T, O> withNamingConvention(NamingConvention namingConvention) {
+        this.namingConvention = namingConvention;
+        return this;
+    }
+
+    private <D> PayloadDeserializer<String, D> deserializerFor(Class<D> type) {
+        return switch (namingConvention) {
+            case CAMEL_CASE  -> DomainMapperFactory.camelCase(type);
+            case SNAKE_CASE  -> DomainMapperFactory.snakeCase(type);
+            case PASCAL_CASE -> DomainMapperFactory.pascalCase(type);
+            case KEBAB_CASE  -> DomainMapperFactory.kebabCase(type);
+        };
+    }
+
+    public PollSourceBuilder<I, T, O> withDomainEvent(Class<? extends Event> eventType) {
+        domainMappings.add(DomainEventMapping.of(deserializerFor(eventType)));
+        return this;
+    }
+
+    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent) {
+        domainMappings.add(DomainEventMapping.of(deserializerFor(dtoType), toEvent));
+        return this;
     }
 }

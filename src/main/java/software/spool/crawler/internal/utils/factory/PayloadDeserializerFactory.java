@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  * Jackson {@link ObjectMapper} instances.
  * </p>
  */
-public class DeserializerFactory {
+public class PayloadDeserializerFactory {
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 

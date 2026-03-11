@@ -1,15 +1,16 @@
-package software.spool.crawler.example.filesystem;
+package software.spool.crawler.example.filesystem.application.io;
 
 import software.spool.core.exception.SpoolException;
 import software.spool.crawler.api.port.source.PollSource;
+import software.spool.crawler.example.filesystem.domain.io.OrderReader;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class FileSystemSource implements PollSource<String> {
+public class FileOrderReader implements OrderReader, PollSource<String> {
     @Override
     public String poll() throws SpoolException {
-        String resourcePath = "/part-000000.jsonn";
+        String resourcePath = "/part-000000.json";
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             assert is != null;
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
@@ -21,5 +22,10 @@ public class FileSystemSource implements PollSource<String> {
     @Override
     public String sourceId() {
         return "filesystem-products";
+    }
+
+    @Override
+    public String read() {
+        return poll();
     }
 }

@@ -34,9 +34,9 @@ public class TransformerFactory {
      */
     public static Transformer<String, JsonNode, JsonNode> jsonArray() {
         return new Transformer<>(
-                DeserializerFactory.json(),
-                SplitterFactory.jsonArray(),
-                SerializerFactory.jsonNode());
+                PayloadDeserializerFactory.json(),
+                PayloadSplitterFactory.jsonArray(),
+                RecordSerializerFactory.jsonNode());
     }
 
     /**
@@ -47,9 +47,9 @@ public class TransformerFactory {
      */
     public static Transformer<String, JsonNode, JsonNode> yamlArray() {
         return new Transformer<>(
-                DeserializerFactory.yamlArray(),
-                SplitterFactory.jsonArray(),
-                SerializerFactory.jsonNode());
+                PayloadDeserializerFactory.yamlArray(),
+                PayloadSplitterFactory.jsonArray(),
+                RecordSerializerFactory.jsonNode());
     }
 
     /**
@@ -65,9 +65,9 @@ public class TransformerFactory {
      */
     public static Transformer<ResultSet, ResultSet, Map<String, Object>> resultSet() {
         return new Transformer<>(
-                r -> r, // No-op para ResultSet
-                SplitterFactory.resultSet(),
-                SerializerFactory.map());
+                r -> r,
+                PayloadSplitterFactory.resultSet(),
+                RecordSerializerFactory.map());
     }
 
     /**
