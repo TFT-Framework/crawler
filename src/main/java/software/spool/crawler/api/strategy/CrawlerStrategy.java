@@ -34,7 +34,7 @@ public interface CrawlerStrategy {
      * Implementations should fetch data from their source, apply the processing
      * pipeline, and route the results to the inbox and event bus. Errors are
      * expected to be handled internally via an
-     * {@link ErrorRouter}
+     * {@link software.spool.core.utils.ErrorRouter ErrorRouter}
      * rather than propagated to the caller whenever possible.
      * </p>
      *

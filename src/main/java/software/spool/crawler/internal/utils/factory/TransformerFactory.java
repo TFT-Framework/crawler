@@ -28,6 +28,11 @@ import java.util.Map;
  * </p>
  */
 public class TransformerFactory {
+
+    private TransformerFactory() {
+        // utility class
+    }
+
     /**
      * Creates a transformer that parses a JSON string into individual
      * {@link JsonNode} array elements.

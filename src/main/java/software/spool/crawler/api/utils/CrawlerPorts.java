@@ -76,6 +76,10 @@ public class CrawlerPorts {
         private EventBusEmitter bus;
         private ErrorRouter errorRouter;
 
+        /** Creates a new empty builder. */
+        Builder() {
+        }
+
         /**
          * Sets the {@link InboxWriter} port.
          *

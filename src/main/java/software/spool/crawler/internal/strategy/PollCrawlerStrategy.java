@@ -64,7 +64,16 @@ public class PollCrawlerStrategy<I, T, O> implements CrawlerStrategy {
         this(source, transformer, ports, List.of());
     }
 
-    public PollCrawlerStrategy(PollSource<I> source, Transformer<T, O> transformer, CrawlerPorts ports, List<DomainEventMapping<?>> domainMappings) {
+    /**
+     * Creates a new strategy with domain event mappings.
+     *
+     * @param source         the poll source to fetch data from
+     * @param transformer    the pipeline to apply to each fetched payload
+     * @param ports          the ports (bus, inbox, error router) to use
+     * @param domainMappings additional domain event mappings
+     */
+    public PollCrawlerStrategy(PollSource<I> source, Transformer<T, O> transformer, CrawlerPorts ports,
+            List<DomainEventMapping<?>> domainMappings) {
         this.source = source;
         this.transformer = transformer;
         this.ports = ports;
@@ -104,7 +113,6 @@ public class PollCrawlerStrategy<I, T, O> implements CrawlerStrategy {
         ports.bus().emit(itemCapturedEvent);
         ports.inboxWriter().receive(payload, itemCapturedEvent.idempotencyKey());
         ports.bus().emit(InboxItemStored.builder().from(itemCapturedEvent).build());
-        domainMappings.forEach(m ->
-                ports.bus().emit(m.resolve(payload, itemCapturedEvent.idempotencyKey())));
+        domainMappings.forEach(m -> ports.bus().emit(m.resolve(payload, itemCapturedEvent.idempotencyKey())));
     }
 }

@@ -32,8 +32,11 @@ import java.util.stream.Stream;
  * Transformer<String, JsonNode, JsonNode> t = Transformer.of(myDeserializer, mySplitter, mySerializer);
  * }</pre>
  *
- * @param <T> the intermediate parsed type
- * @param <O> the individual record type
+ * @param deserializer the deserialization stage
+ * @param splitter     the splitting stage
+ * @param serializer   the serialization stage
+ * @param <T>          the intermediate parsed type
+ * @param <O>          the individual record type
  */
 public record Transformer<T, O>(
         PayloadDeserializer<T> deserializer,
@@ -50,7 +53,7 @@ public record Transformer<T, O>(
      * @return a new {@code Transformer}
      */
     public static <P, T> Transformer<P, T> of(PayloadDeserializer<P> deserializer,
-                                                    PayloadSplitter<P, T> splitter, RecordSerializer<T> serializer) {
+            PayloadSplitter<P, T> splitter, RecordSerializer<T> serializer) {
         return new Transformer<>(deserializer, splitter, serializer);
     }
 
@@ -83,10 +86,18 @@ public record Transformer<T, O>(
      * @return a new {@code Transformer} with an identity splitter
      */
     public static <P> Transformer<P, P> noSplitter(PayloadDeserializer<P> deserializer,
-                                                         RecordSerializer<P> serializer) {
+            RecordSerializer<P> serializer) {
         return new Transformer<>(deserializer, Stream::of, serializer);
     }
 
+    /**
+     * Applies the full pipeline (deserialize → split → serialize) to the given
+     * input and returns a stream of serialized strings.
+     *
+     * @param <I>  the input type
+     * @param poll the raw input from the source
+     * @return a stream of serialized record strings
+     */
     @SuppressWarnings("unchecked")
     public <I> Stream<String> transform(I poll) {
         if (Objects.nonNull(deserializer) && poll instanceof String)

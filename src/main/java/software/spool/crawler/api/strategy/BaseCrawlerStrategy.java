@@ -20,7 +20,7 @@ import java.util.Objects;
  * <li>{@link SourcePollException} → emits {@code SourceFetchFailed}</li>
  * <li>{@link DeserializationException} → emits
  * {@code SourceItemCaptureFailed}</li>
- * <li>{@link SourceSplitException} → emits {@code SourceItemCaptureFailed}</li>
+ * <li>{@link SplitException} → emits {@code SourceItemCaptureFailed}</li>
  * <li>{@link SerializationException} → emits
  * {@code SourceItemCaptureFailed}</li>
  * <li>{@link InboxWriteException} → emits {@code InboxItemStoreFailed}</li>

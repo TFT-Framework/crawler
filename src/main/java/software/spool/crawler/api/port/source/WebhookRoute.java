@@ -12,4 +12,7 @@ package software.spool.crawler.api.port.source;
  * </p>
  */
 public class WebhookRoute {
+    /** Creates a new {@code WebhookRoute}. */
+    public WebhookRoute() {
+    }
 }

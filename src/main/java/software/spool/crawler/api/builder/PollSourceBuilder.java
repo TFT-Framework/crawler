@@ -62,7 +62,8 @@ public class PollSourceBuilder<I, T, O> {
         this(SafePollSource.of(source), null, NamingConvention.SNAKE_CASE, new ArrayList<>());
     }
 
-    private PollSourceBuilder(PollSource<I> source, CrawlerPorts ports, NamingConvention namingConvention, List<DomainEventMapping<?>> domainMappings) {
+    private PollSourceBuilder(PollSource<I> source, CrawlerPorts ports, NamingConvention namingConvention,
+            List<DomainEventMapping<?>> domainMappings) {
         this.source = SafePollSource.of(source);
         this.ports = ports;
         this.namingConvention = namingConvention;
@@ -130,6 +131,18 @@ public class PollSourceBuilder<I, T, O> {
                 .transformer(pipeline);
     }
 
+    /**
+     * Sets the naming convention used when deserializing domain events.
+     *
+     * <p>
+     * The naming convention controls how JSON field names are mapped to Java
+     * record/class fields. Defaults to {@link NamingConvention#SNAKE_CASE}.
+     * </p>
+     *
+     * @param namingConvention the naming convention to use; must not be
+     *                         {@code null}
+     * @return this step for chaining
+     */
     public PollSourceBuilder<I, T, O> withNamingConvention(NamingConvention namingConvention) {
         this.namingConvention = namingConvention;
         return this;
@@ -137,19 +150,48 @@ public class PollSourceBuilder<I, T, O> {
 
     private <D> PayloadDeserializer<D> deserializerFor(Class<D> type) {
         return switch (namingConvention) {
-            case CAMEL_CASE  -> DomainMapperFactory.camelCase(type);
-            case SNAKE_CASE  -> DomainMapperFactory.snakeCase(type);
+            case CAMEL_CASE -> DomainMapperFactory.camelCase(type);
+            case SNAKE_CASE -> DomainMapperFactory.snakeCase(type);
             case PASCAL_CASE -> DomainMapperFactory.pascalCase(type);
-            case KEBAB_CASE  -> DomainMapperFactory.kebabCase(type);
+            case KEBAB_CASE -> DomainMapperFactory.kebabCase(type);
         };
     }
 
+    /**
+     * Registers a domain event type that will be automatically deserialized and
+     * emitted on the event bus for each captured record.
+     *
+     * <p>
+     * The record payload is deserialized into an instance of the given event
+     * type using the currently configured {@link NamingConvention}.
+     * </p>
+     *
+     * @param eventType the domain event class to register; must not be {@code null}
+     * @return this step for chaining
+     */
     public PollSourceBuilder<I, T, O> withDomainEvent(Class<? extends Event> eventType) {
         domainMappings.add(DomainEventMapping.of(deserializerFor(eventType)));
         return this;
     }
 
-    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent) {
+    /**
+     * Registers a domain event mapping that converts a DTO into an {@link Event}
+     * using the provided mapping function.
+     *
+     * <p>
+     * Use this overload when the source payload does not directly implement
+     * {@link Event} and needs to be transformed via a custom function.
+     * </p>
+     *
+     * @param <D>     the DTO type to deserialize from the payload
+     * @param dtoType the DTO class; must not be {@code null}
+     * @param toEvent a function that converts the deserialized DTO and its
+     *                idempotency key into an {@link Event}; must not be
+     *                {@code null}
+     * @return this step for chaining
+     */
+    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType,
+            BiFunction<D, IdempotencyKey, Event> toEvent) {
         domainMappings.add(DomainEventMapping.of(deserializerFor(dtoType), toEvent));
         return this;
     }

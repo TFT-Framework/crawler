@@ -23,6 +23,11 @@ import java.util.stream.StreamSupport;
  * </p>
  */
 public class PayloadSplitterFactory {
+
+    private PayloadSplitterFactory() {
+        // utility class
+    }
+
     /**
      * Returns a splitter that streams the elements of a {@link JsonNode} array.
      *
