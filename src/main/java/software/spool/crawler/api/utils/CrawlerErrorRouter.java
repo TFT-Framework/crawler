@@ -22,7 +22,6 @@ import software.spool.core.utils.ErrorRouter;
  * <li>{@link InboxWriteException} → {@link InboxItemStoreFailed}</li>
  * </ul>
  *
- * @see software.spool.crawler.api.strategy.BaseCrawlerStrategy
  * @see ErrorRouter
  */
 public class CrawlerErrorRouter {
@@ -56,6 +55,7 @@ public class CrawlerErrorRouter {
                                 .errorMessage(e.getMessage()).build()))
                 .on(InboxWriteException.class,
                         (e, cause) -> bus.emit(InboxItemStoreFailed.builder()
-                                .from(cause).errorMessage(e.getMessage()).build()));
+                                .from(cause).errorMessage(e.getMessage()).build()))
+                .orElse((e, cause) -> System.out.println(e.getMessage()));
     }
 }

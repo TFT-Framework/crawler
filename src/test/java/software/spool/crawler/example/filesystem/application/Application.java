@@ -1,6 +1,9 @@
 package software.spool.crawler.example.filesystem.application;
 
 import software.spool.core.adapter.InMemoryEventBus;
+import software.spool.core.model.InboxItem;
+import software.spool.core.model.InboxItemStored;
+import software.spool.core.model.SourceItemCaptureFailed;
 import software.spool.core.port.EventBus;
 import software.spool.core.utils.ErrorRouter;
 import software.spool.crawler.api.builder.CrawlerBuilderFactory;
@@ -32,11 +35,13 @@ public class Application {
                         .errorRouter(router).build())
                 .withFormat(Formats.JSON_ARRAY)
                 .withDomainEvent(OrderDTO.class, (dto, idempotencyKey) -> OrderReceived.from(dto))
+                .withDomainEvent(OrderReceived.class)
                 .create();
     }
 
     public void run() {
-        bus.on(OrderReceived.class, System.out::println);
+        bus.on(SourceItemCaptureFailed.class, System.out::println);
+        // bus.on(InboxItemStored.class, System.out::println);
         strategy.execute();
     }
 }

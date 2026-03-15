@@ -3,14 +3,17 @@ package software.spool.crawler.internal.strategy;
 import software.spool.core.exception.*;
 import software.spool.core.utils.DomainEventMapping;
 import software.spool.crawler.api.port.PayloadSplitter;
-import software.spool.crawler.api.strategy.BaseCrawlerStrategy;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
 import software.spool.crawler.api.utils.CrawlerPorts;
+import software.spool.crawler.internal.utils.TypedDomainMapping;
 import software.spool.crawler.internal.utils.factory.Transformer;
 import software.spool.core.model.*;
 import software.spool.crawler.api.port.source.PollSource;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Concrete {@link CrawlerStrategy} that orchestrates a full
@@ -31,7 +34,6 @@ import java.util.List;
  * {@code SourceItemCaptured} and {@code InboxItemStored} events.</li>
  * <li>Route any {@link SpoolException} through the
  * {@link software.spool.core.utils.ErrorRouter}
- * inherited from {@link BaseCrawlerStrategy}.</li>
  * </ol>
  *
  * <p>
@@ -48,7 +50,7 @@ public class PollCrawlerStrategy<I, T, O> implements CrawlerStrategy {
     private final PollSource<I> source;
     private final Transformer<T, O> transformer;
     private final CrawlerPorts ports;
-    private final List<DomainEventMapping<?>> domainMappings;
+    private final List<TypedDomainMapping> domainMappings;
 
     /**
      * Constructs a new strategy with the given source, transformer and ports.
@@ -73,7 +75,7 @@ public class PollCrawlerStrategy<I, T, O> implements CrawlerStrategy {
      * @param domainMappings additional domain event mappings
      */
     public PollCrawlerStrategy(PollSource<I> source, Transformer<T, O> transformer, CrawlerPorts ports,
-            List<DomainEventMapping<?>> domainMappings) {
+            List<TypedDomainMapping> domainMappings) {
         this.source = source;
         this.transformer = transformer;
         this.ports = ports;
@@ -107,12 +109,32 @@ public class PollCrawlerStrategy<I, T, O> implements CrawlerStrategy {
      * @param payload the serialized and split record to process
      */
     private void process(String payload) {
-        SourceItemCaptured itemCapturedEvent = SourceItemCaptured.builder()
-                .idempotencyKey(IdempotencyKey.of(source.sourceId(), payload))
-                .build();
-        ports.bus().emit(itemCapturedEvent);
-        ports.inboxWriter().receive(payload, itemCapturedEvent.idempotencyKey());
-        ports.bus().emit(InboxItemStored.builder().from(itemCapturedEvent).build());
-        domainMappings.forEach(m -> ports.bus().emit(m.resolve(payload, itemCapturedEvent.idempotencyKey())));
+        try {
+            IdempotencyKey idempotencyKey = IdempotencyKey.of(source.sourceId(), payload);
+            Optional<Class<?>> eventType = emitDomainEventFrom(payload, idempotencyKey);
+            String partitionKey = eventType
+                    .map(Class::getSimpleName)
+                    .orElse(source.sourceId());
+            SourceItemCaptured itemCapturedEvent = SourceItemCaptured.builder()
+                    .idempotencyKey(idempotencyKey)
+                    .build();
+            ports.bus().emit(itemCapturedEvent);
+            ports.inboxWriter().receive(payload, itemCapturedEvent.idempotencyKey());
+            ports.bus().emit(InboxItemStored.builder().from(itemCapturedEvent).build());
+        } catch (Exception e) {
+            ports.errorRouter().dispatch(e);
+        }
+    }
+
+    private Optional<Class<?>> emitDomainEventFrom(String payload, IdempotencyKey idempotencyKey) {
+        if (domainMappings.isEmpty()) return Optional.empty();
+        domainMappings.forEach(m -> {});
+        for (TypedDomainMapping typed : domainMappings) {
+            try {
+                ports.bus().emit(typed.mapping().resolve(payload, idempotencyKey));
+                return Optional.of(typed.targetType());
+            } catch (Exception ignored) {}
+        }
+        throw new DeserializationException(payload, "No proper domain event mapper found. Payload will be stored anyway");
     }
 }

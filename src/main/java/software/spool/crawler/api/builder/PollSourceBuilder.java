@@ -15,6 +15,7 @@ import software.spool.crawler.internal.port.decorator.SafePollSource;
 import software.spool.crawler.internal.port.decorator.SafeRecordSerializer;
 import software.spool.crawler.internal.strategy.PollCrawlerStrategy;
 import software.spool.crawler.api.utils.CrawlerPorts;
+import software.spool.crawler.internal.utils.TypedDomainMapping;
 import software.spool.crawler.internal.utils.factory.Transformer;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class PollSourceBuilder<I, T, O> {
     private Transformer<T, O> transformer;
     private CrawlerPorts ports;
     private NamingConvention namingConvention;
-    private final List<DomainEventMapping<?>> domainMappings;
+    private final List<TypedDomainMapping> domainMappings;
 
     /**
      * Creates a new step wrapping the given source and ports.
@@ -63,7 +64,7 @@ public class PollSourceBuilder<I, T, O> {
     }
 
     private PollSourceBuilder(PollSource<I> source, CrawlerPorts ports, NamingConvention namingConvention,
-            List<DomainEventMapping<?>> domainMappings) {
+            List<TypedDomainMapping> domainMappings) {
         this.source = SafePollSource.of(source);
         this.ports = ports;
         this.namingConvention = namingConvention;
@@ -170,7 +171,7 @@ public class PollSourceBuilder<I, T, O> {
      * @return this step for chaining
      */
     public PollSourceBuilder<I, T, O> withDomainEvent(Class<? extends Event> eventType) {
-        domainMappings.add(DomainEventMapping.of(deserializerFor(eventType)));
+        domainMappings.add(new TypedDomainMapping(eventType, DomainEventMapping.of(deserializerFor(eventType))));
         return this;
     }
 
@@ -190,9 +191,8 @@ public class PollSourceBuilder<I, T, O> {
      *                {@code null}
      * @return this step for chaining
      */
-    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType,
-            BiFunction<D, IdempotencyKey, Event> toEvent) {
-        domainMappings.add(DomainEventMapping.of(deserializerFor(dtoType), toEvent));
+    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent) {
+        domainMappings.add(new TypedDomainMapping(dtoType, DomainEventMapping.of(deserializerFor(dtoType), toEvent)));
         return this;
     }
 }
