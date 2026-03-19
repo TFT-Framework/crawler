@@ -12,7 +12,6 @@ import software.spool.crawler.api.port.InboxWriter;
  * typed {@link InboxWriteException} instances.
  *
  * <p>
- * If the delegate's {@link #receive(String, IdempotencyKey)} method throws a
  * {@link SpoolException} subclass, it is re-thrown as-is. Any other
  * {@link Exception} is wrapped in a new {@link InboxWriteException}.
  * </p>

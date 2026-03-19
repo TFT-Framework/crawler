@@ -14,9 +14,6 @@ import software.spool.crawler.api.port.source.PollSource;
  * poll-deserialize-split-serialize
  * cycle and delivers each resulting record to the inbox and event bus.
  *
- * <p>
- * The execution flow performed by {@link #execute()} is:
- * </p>
  * <ol>
  * <li>Open the {@link PollSource} inside a try-with-resources block.</li>
  * <li>Call {@link PollSource#poll()} to fetch the raw payload.</li>
