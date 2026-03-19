@@ -1,8 +1,10 @@
 package software.spool.crawler.api.utils;
 
 import software.spool.core.port.EventBusEmitter;
+import software.spool.core.port.decorator.SafeEventBusEmitter;
 import software.spool.core.utils.ErrorRouter;
 import software.spool.crawler.api.port.InboxWriter;
+import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
 
 /**
  * Aggregates the external ports required by a crawler strategy into a single
@@ -87,7 +89,7 @@ public class CrawlerPorts {
          * @return this builder for chaining
          */
         public Builder inbox(InboxWriter inboxWriter) {
-            this.inboxWriter = inboxWriter;
+            this.inboxWriter = SafeInboxWriter.of(inboxWriter);
             return this;
         }
 
@@ -98,7 +100,7 @@ public class CrawlerPorts {
          * @return this builder for chaining
          */
         public Builder bus(EventBusEmitter bus) {
-            this.bus = bus;
+            this.bus = SafeEventBusEmitter.of(bus);
             return this;
         }
 

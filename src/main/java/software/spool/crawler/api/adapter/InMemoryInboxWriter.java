@@ -2,6 +2,7 @@ package software.spool.crawler.api.adapter;
 
 import software.spool.core.exception.SpoolException;
 import software.spool.core.model.IdempotencyKey;
+import software.spool.core.model.InboxItem;
 import software.spool.crawler.api.port.InboxWriter;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
  * </p>
  */
 public class InMemoryInboxWriter implements InboxWriter {
-    private final Map<IdempotencyKey, String> inbox;
+    private final Map<IdempotencyKey, InboxItem> inbox;
 
     /** Creates a new empty in-memory inbox. */
     public InMemoryInboxWriter() {
@@ -31,9 +32,9 @@ public class InMemoryInboxWriter implements InboxWriter {
     }
 
     @Override
-    public IdempotencyKey receive(String payload, IdempotencyKey idempotencyKey) throws SpoolException {
-        this.inbox.put(idempotencyKey, payload);
-        return idempotencyKey;
+    public IdempotencyKey receive(InboxItem item) throws SpoolException {
+        this.inbox.put(item.idempotencyKey(), item);
+        return item.idempotencyKey();
     }
 
     @Override

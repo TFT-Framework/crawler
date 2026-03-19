@@ -1,8 +1,10 @@
 package software.spool.crawler.internal.port.decorator;
 
+import software.spool.core.exception.DuplicateEventException;
 import software.spool.core.exception.InboxWriteException;
 import software.spool.core.exception.SpoolException;
 import software.spool.core.model.IdempotencyKey;
+import software.spool.core.model.InboxItem;
 import software.spool.crawler.api.port.InboxWriter;
 
 /**
@@ -33,9 +35,9 @@ public class SafeInboxWriter implements InboxWriter {
     }
 
     @Override
-    public IdempotencyKey receive(String payload, IdempotencyKey idempotencyKey) throws InboxWriteException {
+    public IdempotencyKey receive(InboxItem item) throws InboxWriteException {
         try {
-            return inbox.receive(payload, idempotencyKey);
+            return inbox.receive(item);
         } catch (SpoolException e) {
             throw e;
         } catch (Exception e) {

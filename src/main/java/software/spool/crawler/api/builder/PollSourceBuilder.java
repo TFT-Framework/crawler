@@ -1,25 +1,27 @@
 package software.spool.crawler.api.builder;
 
-import software.spool.core.infrastructure.adapter.DomainMapperFactory;
+import software.spool.core.exception.SpoolException;
 import software.spool.core.model.Event;
 import software.spool.core.model.IdempotencyKey;
 import software.spool.core.port.PayloadDeserializer;
 import software.spool.core.utils.DomainEventMapping;
 import software.spool.core.utils.NamingConvention;
+import software.spool.crawler.api.Crawler;
 import software.spool.crawler.api.utils.TransformerFormat;
 import software.spool.crawler.api.port.source.PollSource;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
+import software.spool.crawler.internal.control.ItemCapturedHandler;
 import software.spool.crawler.internal.port.decorator.SafePayloadDeserializer;
 import software.spool.crawler.internal.port.decorator.SafePayloadSplitter;
 import software.spool.crawler.internal.port.decorator.SafePollSource;
 import software.spool.crawler.internal.port.decorator.SafeRecordSerializer;
 import software.spool.crawler.internal.strategy.PollCrawlerStrategy;
 import software.spool.crawler.api.utils.CrawlerPorts;
+import software.spool.crawler.internal.utils.DomainEventEmitter;
 import software.spool.crawler.internal.utils.TypedDomainMapping;
 import software.spool.crawler.internal.utils.factory.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
@@ -35,7 +37,7 @@ import java.util.function.BiFunction;
  * <p>
  * All ports passed to the setter methods are automatically wrapped in their
  * corresponding {@code Safe*} decorators to normalise unchecked exceptions into
- * typed {@link software.spool.core.exception.SpoolException} subclasses.
+ * typed {@link SpoolException} subclasses.
  * </p>
  *
  * @param <I> the raw type returned by the configured {@link PollSource}
@@ -48,6 +50,7 @@ public class PollSourceBuilder<I, T, O> {
     private CrawlerPorts ports;
     private NamingConvention namingConvention;
     private final List<TypedDomainMapping> domainMappings;
+    private final List<String> defaultPartitionAttributes;
 
     /**
      * Creates a new step wrapping the given source and ports.
@@ -60,15 +63,16 @@ public class PollSourceBuilder<I, T, O> {
      * @param source the poll source; must not be {@code null}
      */
     public PollSourceBuilder(PollSource<I> source) {
-        this(SafePollSource.of(source), null, NamingConvention.SNAKE_CASE, new ArrayList<>());
+        this(SafePollSource.of(source), null, NamingConvention.SNAKE_CASE, new ArrayList<>(), new ArrayList<>());
     }
 
     private PollSourceBuilder(PollSource<I> source, CrawlerPorts ports, NamingConvention namingConvention,
-            List<TypedDomainMapping> domainMappings) {
+            List<TypedDomainMapping> domainMappings, List<String> defaultPartitionAttributes) {
         this.source = SafePollSource.of(source);
         this.ports = ports;
         this.namingConvention = namingConvention;
         this.domainMappings = domainMappings;
+        this.defaultPartitionAttributes = defaultPartitionAttributes;
     }
 
     /**
@@ -104,15 +108,6 @@ public class PollSourceBuilder<I, T, O> {
     }
 
     /**
-     * Builds and returns the configured {@link CrawlerStrategy}.
-     *
-     * @return a fully configured {@link CrawlerStrategy} ready to be executed
-     */
-    public CrawlerStrategy create() {
-        return new PollCrawlerStrategy<>(source, transformer, ports, domainMappings);
-    }
-
-    /**
      * Applies the given {@link TransformerFormat} to this step, returning a new
      * step with updated type parameters matching the format's output types.
      *
@@ -128,7 +123,7 @@ public class PollSourceBuilder<I, T, O> {
      */
     public <NT, NO> PollSourceBuilder<I, NT, NO> withFormat(TransformerFormat<NT, NO> format) {
         Transformer<NT, NO> pipeline = format.pipeline();
-        return new PollSourceBuilder<I, NT, NO>(source, ports, namingConvention, domainMappings)
+        return new PollSourceBuilder<I, NT, NO>(source, ports, namingConvention, domainMappings, defaultPartitionAttributes)
                 .transformer(pipeline);
     }
 
@@ -150,49 +145,42 @@ public class PollSourceBuilder<I, T, O> {
     }
 
     private <D> PayloadDeserializer<D> deserializerFor(Class<D> type) {
-        return switch (namingConvention) {
-            case CAMEL_CASE -> DomainMapperFactory.camelCase(type);
-            case SNAKE_CASE -> DomainMapperFactory.snakeCase(type);
-            case PASCAL_CASE -> DomainMapperFactory.pascalCase(type);
-            case KEBAB_CASE -> DomainMapperFactory.kebabCase(type);
-        };
+        return namingConvention.deserializerFor(type);
     }
 
-    /**
-     * Registers a domain event type that will be automatically deserialized and
-     * emitted on the event bus for each captured record.
-     *
-     * <p>
-     * The record payload is deserialized into an instance of the given event
-     * type using the currently configured {@link NamingConvention}.
-     * </p>
-     *
-     * @param eventType the domain event class to register; must not be {@code null}
-     * @return this step for chaining
-     */
-    public PollSourceBuilder<I, T, O> withDomainEvent(Class<? extends Event> eventType) {
-        domainMappings.add(new TypedDomainMapping(eventType, DomainEventMapping.of(deserializerFor(eventType))));
+    public PollSourceBuilder<I, T, O> withDomainEvent(Class<? extends Event> eventType, String... partitionAttributes) {
+        domainMappings.add(new TypedDomainMapping(eventType,
+                DomainEventMapping.of(deserializerFor(eventType)),
+                List.of(partitionAttributes)));
+        return this;
+    }
+
+    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType, BiFunction<D,
+            IdempotencyKey, Event> toEvent, String... partitionAttributes) {
+        domainMappings.add(new TypedDomainMapping(dtoType,
+                DomainEventMapping.of(deserializerFor(dtoType), toEvent),
+                List.of(partitionAttributes)));
+        return this;
+    }
+
+    public PollSourceBuilder<I, T, O> withPartitionAttributes(String... attributes) {
+        defaultPartitionAttributes.addAll(List.of(attributes));
         return this;
     }
 
     /**
-     * Registers a domain event mapping that converts a DTO into an {@link Event}
-     * using the provided mapping function.
+     * Builds and returns the configured {@link CrawlerStrategy}.
      *
-     * <p>
-     * Use this overload when the source payload does not directly implement
-     * {@link Event} and needs to be transformed via a custom function.
-     * </p>
-     *
-     * @param <D>     the DTO type to deserialize from the payload
-     * @param dtoType the DTO class; must not be {@code null}
-     * @param toEvent a function that converts the deserialized DTO and its
-     *                idempotency key into an {@link Event}; must not be
-     *                {@code null}
-     * @return this step for chaining
+     * @return a fully configured {@link CrawlerStrategy} ready to be executed
      */
-    public <D> PollSourceBuilder<I, T, O> withDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent) {
-        domainMappings.add(new TypedDomainMapping(dtoType, DomainEventMapping.of(deserializerFor(dtoType), toEvent)));
-        return this;
+    public Crawler create() {
+        return new Crawler(new PollCrawlerStrategy<>(source, transformer, ports.errorRouter(), createHandler()), ports.errorRouter());
+    }
+
+    private ItemCapturedHandler createHandler() {
+        if (!domainMappings.isEmpty() && !defaultPartitionAttributes.isEmpty())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use withDomainEvent(...) or withPartitionAttributes(...) but not both.");
+        return new ItemCapturedHandler(source.sourceId(), ports,
+                new DomainEventEmitter(ports.bus(), domainMappings), defaultPartitionAttributes);
     }
 }
