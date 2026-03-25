@@ -1,8 +1,8 @@
 package software.spool.crawler.api;
 
+import software.spool.core.utils.CancellationToken;
 import software.spool.core.utils.ErrorRouter;
 import software.spool.crawler.api.strategy.CrawlerStrategy;
-import software.spool.crawler.internal.control.CancellationToken;
 
 public class Crawler implements AutoCloseable {
     private final CrawlerStrategy strategy;

@@ -1,10 +1,8 @@
 package software.spool.crawler.api.strategy;
 
 import software.spool.core.exception.SpoolException;
-import software.spool.core.port.Subscription;
+import software.spool.core.utils.CancellationToken;
 import software.spool.crawler.api.builder.CrawlerBuilderFactory;
-import software.spool.crawler.internal.control.CancellationToken;
-import software.spool.crawler.internal.control.CrawlerLifecycle;
 
 /**
  * Core abstraction representing a single crawler execution cycle.

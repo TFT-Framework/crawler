@@ -45,6 +45,8 @@ public final class Formats {
          */
         public static final TransformerFormat<JsonNode, JsonNode> JSON_ARRAY = TransformerFactory::jsonArray;
 
+        public static final TransformerFormat<JsonNode, JsonNode> JSON_OBJECT = TransformerFactory::jsonObject;
+
         /**
          * Pipeline for JDBC {@link ResultSet} sources.
          *

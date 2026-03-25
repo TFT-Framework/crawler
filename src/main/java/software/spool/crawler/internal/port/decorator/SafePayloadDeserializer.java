@@ -41,7 +41,7 @@ public class SafePayloadDeserializer<T> implements PayloadDeserializer<T> {
         } catch (SpoolException e) {
             throw e;
         } catch (Exception e) {
-            throw new DeserializationException(payload, e);
+            throw new DeserializationException(payload, e.getMessage());
         }
     }
 }

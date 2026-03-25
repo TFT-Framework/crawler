@@ -25,12 +25,10 @@ import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
 public class CrawlerPorts {
     private final InboxWriter inboxWriter;
     private final EventBusEmitter bus;
-    private final ErrorRouter errorRouter;
 
     private CrawlerPorts(Builder builder) {
         this.inboxWriter = builder.inboxWriter;
         this.bus = builder.bus;
-        this.errorRouter = builder.errorRouter;
     }
 
     /**
@@ -51,14 +49,6 @@ public class CrawlerPorts {
         return bus;
     }
 
-    /**
-     * Returns the {@link ErrorRouter} that handles exceptions during crawling.
-     *
-     * @return the error router; may be {@code null} to use the strategy default
-     */
-    public ErrorRouter errorRouter() {
-        return errorRouter;
-    }
 
     /**
      * Returns a new {@link Builder} for constructing a {@code CrawlerPorts}
@@ -76,7 +66,6 @@ public class CrawlerPorts {
     public static class Builder {
         private InboxWriter inboxWriter;
         private EventBusEmitter bus;
-        private ErrorRouter errorRouter;
 
         /** Creates a new empty builder. */
         Builder() {
@@ -101,18 +90,6 @@ public class CrawlerPorts {
          */
         public Builder bus(EventBusEmitter bus) {
             this.bus = SafeEventBusEmitter.of(bus);
-            return this;
-        }
-
-        /**
-         * Sets the error router.
-         *
-         * @param errorRouter the error router to use; pass {@code null} to use the
-         *                    strategy's default routing table
-         * @return this builder for chaining
-         */
-        public Builder errorRouter(ErrorRouter errorRouter) {
-            this.errorRouter = errorRouter;
             return this;
         }
 

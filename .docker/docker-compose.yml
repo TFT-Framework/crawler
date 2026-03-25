@@ -5,15 +5,13 @@ services:
     image: postgres:16-alpine
     container_name: spool-postgres
     environment:
-      POSTGRES_USER: spool_user
-      POSTGRES_PASSWORD: spool_pass
-      POSTGRES_DB: spool_db
+      POSTGRES_USER: spool
+      POSTGRES_PASSWORD: spool
+      POSTGRES_DB: spool
     ports:
       - "5432:5432"
-    volumes:
-      - ./postgres/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U spool_user -d spool_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U spool -d spool" ]
       interval: 10s
       timeout: 5s
       retries: 5

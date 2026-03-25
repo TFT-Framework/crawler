@@ -99,4 +99,11 @@ public class TransformerFactory {
             RecordSerializer<T> serializer) {
         return new Transformer<>(deserializer, splitter, serializer);
     }
+
+    public static Transformer<JsonNode, JsonNode> jsonObject() {
+        return new Transformer<>(
+                PayloadDeserializerFactory.json(),
+                PayloadSplitterFactory.single(),
+                RecordSerializerFactory.jsonNode());
+    }
 }
