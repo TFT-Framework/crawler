@@ -1,6 +1,5 @@
 services:
 
-  # Pull desde base de datos
   postgres:
     image: postgres:16-alpine
     container_name: spool-postgres
@@ -15,19 +14,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    profiles: [ pull-db ]
 
-  # Pull desde API REST
-  mock-rest-api:
-    image: wiremock/wiremock:latest
-    container_name: spool-mock-api
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./wiremock:/home/wiremock
-    profiles: [pull-api]
-
-  # Stream desde Kafka
   kafka:
     image: apache/kafka:3.9.0
     container_name: spool-kafka
@@ -44,17 +31,10 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
     ports:
       - "9092:9092"
-    profiles: [ stream ]
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: spool-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    profiles: [stream]
 
   tempo:
     image: grafana/tempo:2.6.1
+    container_name: spool-tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./tempo.yaml:/etc/tempo.yaml:ro
@@ -64,6 +44,7 @@ services:
 
   grafana:
     image: grafana/grafana:11.4.0
+    container_name: spool-grafana
     ports:
       - "3000:3000"
     environment:
