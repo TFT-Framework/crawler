@@ -22,7 +22,7 @@ import java.util.Map;
  * <p>
  * Example usage:
  * </p>
- * 
+ *
  * <pre>{@code
  * Crawlers.poll(mySource)
  *                 .withFormat(Formats.JSON_ARRAY)
@@ -69,4 +69,15 @@ public final class Formats {
          * </p>
          */
         public static final TransformerFormat<JsonNode, JsonNode> YAML_ARRAY = TransformerFactory::yamlArray;
+
+        @SuppressWarnings("unchecked")
+        public static TransformerFormat<Object, Object> valueOf(String format) {
+                return (TransformerFormat<Object, Object>) switch (format.toUpperCase()) {
+                        case "JSON_ARRAY"  -> JSON_ARRAY;
+                        case "JSON_OBJECT" -> JSON_OBJECT;
+                        case "RESULT_SET"  -> RESULT_SET;
+                        case "YAML_ARRAY"  -> YAML_ARRAY;
+                        default -> throw new IllegalArgumentException("Unknown format: " + format);
+                };
+        }
 }

@@ -1,8 +1,7 @@
 package software.spool.crawler.api.utils;
 
-import software.spool.core.port.EventBusEmitter;
+import software.spool.core.port.bus.EventBusEmitter;
 import software.spool.core.port.decorator.SafeEventBusEmitter;
-import software.spool.core.utils.ErrorRouter;
 import software.spool.crawler.api.port.InboxWriter;
 import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
 

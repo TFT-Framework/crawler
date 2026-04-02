@@ -1,7 +1,7 @@
 package software.spool.crawler.internal.utils.factory;
 
-import software.spool.core.port.PayloadDeserializer;
-import software.spool.core.port.RecordSerializer;
+import software.spool.core.port.serde.PayloadDeserializer;
+import software.spool.core.port.serde.RecordSerializer;
 import software.spool.crawler.api.port.PayloadSplitter;
 
 import java.util.Objects;

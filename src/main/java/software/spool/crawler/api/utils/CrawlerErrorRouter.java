@@ -1,29 +1,11 @@
 package software.spool.crawler.api.utils;
 
 import software.spool.core.exception.*;
-import software.spool.core.model.*;
-import software.spool.core.port.EventBusEmitter;
-import software.spool.core.utils.ErrorRouter;
+import software.spool.core.model.failure.*;
+import software.spool.core.port.bus.EventBusEmitter;
+import software.spool.core.utils.routing.ErrorRouter;
 
-/**
- * Provides the default {@link ErrorRouter} configuration for crawler
- * strategies.
- *
- * <p>
- * The routing table maps each typed exception to an appropriate failure event
- * that is emitted on the {@link EventBusEmitter}:
- * </p>
- * <ul>
- * <li>{@link SourceOpenException} → {@link SourceFetchFailed}</li>
- * <li>{@link SourcePollException} → {@link SourceFetchFailed}</li>
- * <li>{@link DeserializationException} → {@link SourceItemCaptureFailed}</li>
- * <li>{@link SplitException} → {@link SourceItemCaptureFailed}</li>
- * <li>{@link SerializationException} → {@link SourceItemCaptureFailed}</li>
- * <li>{@link InboxWriteException} → {@link InboxItemStoreFailed}</li>
- * </ul>
- *
- * @see ErrorRouter
- */
+
 public class CrawlerErrorRouter {
 
     private CrawlerErrorRouter() {

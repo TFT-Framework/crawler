@@ -1,10 +1,10 @@
 package software.spool.crawler.internal.utils.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import software.spool.core.infrastructure.adapter.PayloadDeserializerFactory;
-import software.spool.core.infrastructure.adapter.RecordSerializerFactory;
-import software.spool.core.port.PayloadDeserializer;
-import software.spool.core.port.RecordSerializer;
+import software.spool.core.adapter.jackson.PayloadDeserializerFactory;
+import software.spool.core.adapter.jackson.RecordSerializerFactory;
+import software.spool.core.port.serde.PayloadDeserializer;
+import software.spool.core.port.serde.RecordSerializer;
 import software.spool.crawler.api.port.PayloadSplitter;
 import software.spool.crawler.api.utils.Formats;
 
@@ -41,7 +41,7 @@ public class TransformerFactory {
      */
     public static Transformer<JsonNode, JsonNode> jsonArray() {
         return new Transformer<>(
-                PayloadDeserializerFactory.json(),
+                PayloadDeserializerFactory.json().asNode(),
                 PayloadSplitterFactory.jsonArray(),
                 RecordSerializerFactory.jsonNode());
     }
@@ -54,7 +54,7 @@ public class TransformerFactory {
      */
     public static Transformer<JsonNode, JsonNode> yamlArray() {
         return new Transformer<>(
-                PayloadDeserializerFactory.yamlArray(),
+                PayloadDeserializerFactory.yaml().asNode(),
                 PayloadSplitterFactory.jsonArray(),
                 RecordSerializerFactory.jsonNode());
     }
@@ -102,7 +102,7 @@ public class TransformerFactory {
 
     public static Transformer<JsonNode, JsonNode> jsonObject() {
         return new Transformer<>(
-                PayloadDeserializerFactory.json(),
+                PayloadDeserializerFactory.json().asNode(),
                 PayloadSplitterFactory.single(),
                 RecordSerializerFactory.jsonNode());
     }

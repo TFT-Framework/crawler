@@ -1,6 +1,7 @@
 package software.spool.crawler.internal.utils;
 
-import software.spool.core.utils.DomainEventMapping;
+
+import software.spool.core.utils.serialization.DomainEventMapping;
 
 import java.util.List;
 

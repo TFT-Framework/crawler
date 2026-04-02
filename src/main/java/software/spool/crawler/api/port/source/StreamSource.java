@@ -1,7 +1,7 @@
 package software.spool.crawler.api.port.source;
 
-import software.spool.core.model.SourceItemCaptured;
 import software.spool.core.exception.SpoolException;
+import software.spool.core.model.event.SourceItemCaptured;
 
 import java.util.function.Consumer;
 

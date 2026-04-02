@@ -1,0 +1,40 @@
+spool:
+  infrastructure:
+    event-bus:
+      in-memory:
+        url: localhost:9092
+    inbox:
+      sql:
+        database: spool
+        user: spool
+        password: spool
+  crawlers:
+    - id: gemini-market
+      poll:
+        source:
+          id: gemini-market
+          http:
+            url: https://api.gemini.com/v2/ticker/BTCUSD
+            method: GET
+        schedule:
+          every: 5
+        format: JSON_OBJECT
+        event-mapping:
+          naming-convention: SNAKE_CASE
+          partition-attributes:
+            - symbol
+
+    - id: gemini-market-v2
+      poll:
+        source:
+          id: gemini-market
+          http:
+            url: https://api.gemini.com/v1/trades/BTCUSD?limit_trades=100
+            method: GET
+        schedule:
+          every: 60
+        format: JSON_ARRAY
+        event-mapping:
+          naming-convention: SNAKE_CASE
+          partition-attributes:
+            - symbol

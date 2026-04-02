@@ -1,8 +1,8 @@
 package software.spool.crawler.api.port;
 
 import software.spool.core.exception.*;
-import software.spool.core.model.IdempotencyKey;
-import software.spool.core.model.InboxItem;
+import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.core.model.vo.InboxItem;
 import software.spool.crawler.api.adapter.InMemoryInboxWriter;
 
 /**

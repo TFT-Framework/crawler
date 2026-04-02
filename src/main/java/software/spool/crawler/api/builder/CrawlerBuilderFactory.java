@@ -1,5 +1,10 @@
 package software.spool.crawler.api.builder;
 
+import software.spool.core.adapter.watchdog.HttpWatchdogClient;
+import software.spool.core.model.watchdog.ModuleIdentity;
+import software.spool.core.port.watchdog.ModuleHeartBeat;
+import software.spool.core.port.watchdog.WatchdogClient;
+import software.spool.core.utils.polling.PollingHeartbeat;
 import software.spool.crawler.api.port.source.PollSource;
 import software.spool.crawler.api.adapter.InMemoryInboxWriter;
 
@@ -39,7 +44,6 @@ public final class CrawlerBuilderFactory {
      * <p>
      * The returned {@link PollingCrawlerBuilder} allows further configuration of the
      * processing format, ports, and sender name before calling
-     * {@link PollingCrawlerBuilder#create()} to obtain the final
      * {@link software.spool.crawler.api.strategy.CrawlerStrategy}.
      * </p>
      *
@@ -47,7 +51,15 @@ public final class CrawlerBuilderFactory {
      * @param source the poll source to crawl; must not be {@code null}
      * @return a fluent builder step for completing the crawler configuration
      */
-    public static <R> PollingCrawlerBuilder<R, R, R> poll(PollSource<R> source) {
-        return new PollingCrawlerBuilder<>(source);
+    public static <R> PollingCrawlerBuilder<R> poll(PollSource<R> source) {
+        return new PollingCrawlerBuilder<>(source, initializeHeartbeat());
+    }
+
+    private static ModuleHeartBeat initializeHeartbeat() {
+        return new PollingHeartbeat(createWatchdogClient(), ModuleIdentity.random("crawler"));
+    }
+
+    private static WatchdogClient createWatchdogClient() {
+        return new HttpWatchdogClient("http://localhost:8090");
     }
 }

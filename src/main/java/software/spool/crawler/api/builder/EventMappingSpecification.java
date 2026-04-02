@@ -1,12 +1,12 @@
 package software.spool.crawler.api.builder;
 
+import software.spool.core.adapter.jackson.PayloadDeserializerFactory;
 import software.spool.core.model.Event;
-import software.spool.core.model.IdempotencyKey;
-import software.spool.core.port.EventBus;
-import software.spool.core.port.EventBusEmitter;
-import software.spool.core.port.PayloadDeserializer;
-import software.spool.core.utils.DomainEventMapping;
-import software.spool.core.utils.NamingConvention;
+import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.core.port.bus.EventBusEmitter;
+import software.spool.core.port.serde.NamingConvention;
+import software.spool.core.port.serde.PayloadDeserializer;
+import software.spool.core.utils.serialization.DomainEventMapping;
 import software.spool.crawler.internal.utils.DomainEventEmitter;
 import software.spool.crawler.internal.utils.TypedDomainMapping;
 
@@ -26,7 +26,7 @@ public class EventMappingSpecification {
     }
 
     private <D> PayloadDeserializer<D> deserializerFor(Class<D> type) {
-        return namingConvention.deserializerFor(type);
+        return PayloadDeserializerFactory.json().convention(this.namingConvention).as(type);
     }
 
     public EventMappingSpecification addDomainEvent(Class<? extends Event> eventType, String... partitionAttributes) {

@@ -1,10 +1,9 @@
 package software.spool.crawler.internal.port.decorator;
 
-import software.spool.core.exception.DuplicateEventException;
 import software.spool.core.exception.InboxWriteException;
 import software.spool.core.exception.SpoolException;
-import software.spool.core.model.IdempotencyKey;
-import software.spool.core.model.InboxItem;
+import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.core.model.vo.InboxItem;
 import software.spool.crawler.api.port.InboxWriter;
 
 /**

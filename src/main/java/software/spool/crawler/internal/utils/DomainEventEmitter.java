@@ -2,8 +2,8 @@ package software.spool.crawler.internal.utils;
 
 import software.spool.core.exception.DeserializationException;
 import software.spool.core.exception.SerializationException;
-import software.spool.core.model.IdempotencyKey;
-import software.spool.core.port.EventBusEmitter;
+import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.core.port.bus.EventBusEmitter;
 
 import java.util.List;
 import java.util.Optional;
