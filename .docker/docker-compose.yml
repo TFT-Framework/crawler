@@ -42,9 +42,20 @@ services:
       - "4317:4317"
       - "3200:3200"
 
+  loki:
+    image: grafana/loki:3.3.0
+    container_name: spool-loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    volumes:
+      - ./loki.yaml:/etc/loki.yaml:ro
+    ports:
+      - "3100:3100"
+
   grafana:
     image: grafana/grafana:11.4.0
     container_name: spool-grafana
+    volumes:
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
     ports:
       - "3000:3000"
     environment:
@@ -53,3 +64,4 @@ services:
       - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
     depends_on:
       - tempo
+      - loki
