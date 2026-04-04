@@ -30,6 +30,8 @@ public class EventMappingSpecification {
     }
 
     public EventMappingSpecification addDomainEvent(Class<? extends Event> eventType, String... partitionAttributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
         domainMappings.add(new TypedDomainMapping(eventType,
                 DomainEventMapping.of(deserializerFor(eventType)),
                 List.of(partitionAttributes)));
@@ -37,6 +39,8 @@ public class EventMappingSpecification {
     }
 
     public <D> EventMappingSpecification addDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent, String... partitionAttributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
         domainMappings.add(new TypedDomainMapping(dtoType,
                 DomainEventMapping.of(deserializerFor(dtoType), toEvent),
                 List.of(partitionAttributes)));
@@ -44,6 +48,8 @@ public class EventMappingSpecification {
     }
 
     public EventMappingSpecification addPartitionAttributes(String... attributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
         defaultPartitionAttributes.addAll(List.of(attributes));
         return this;
     }

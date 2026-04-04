@@ -6,7 +6,7 @@ import software.spool.core.adapter.jackson.RecordSerializerFactory;
 import software.spool.core.port.serde.PayloadDeserializer;
 import software.spool.core.port.serde.RecordSerializer;
 import software.spool.crawler.api.port.PayloadSplitter;
-import software.spool.crawler.api.utils.Formats;
+import software.spool.crawler.api.utils.StandardFormat;
 
 import java.sql.ResultSet;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * <p>
  * The factory methods are referenced directly from the constants in
- * {@link Formats} as method references:
+ * {@link StandardFormat} as method references:
  * 
  * <pre>{@code
  * ProcessorFormat<String, JsonNode, JsonNode> JSON_ARRAY = TransformerFactory::jsonArray;

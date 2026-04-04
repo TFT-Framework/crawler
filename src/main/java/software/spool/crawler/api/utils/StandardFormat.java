@@ -29,9 +29,9 @@ import java.util.Map;
  *                 .create();
  * }</pre>
  */
-public final class Formats {
+public final class StandardFormat {
 
-        private Formats() {
+        private StandardFormat() {
         }
 
         /**
@@ -70,9 +70,8 @@ public final class Formats {
          */
         public static final TransformerFormat<JsonNode, JsonNode> YAML_ARRAY = TransformerFactory::yamlArray;
 
-        @SuppressWarnings("unchecked")
-        public static TransformerFormat<Object, Object> valueOf(String format) {
-                return (TransformerFormat<Object, Object>) switch (format.toUpperCase()) {
+        public static TransformerFormat<?, ?> valueOf(String format) {
+                return switch (format.toUpperCase()) {
                         case "JSON_ARRAY"  -> JSON_ARRAY;
                         case "JSON_OBJECT" -> JSON_OBJECT;
                         case "RESULT_SET"  -> RESULT_SET;

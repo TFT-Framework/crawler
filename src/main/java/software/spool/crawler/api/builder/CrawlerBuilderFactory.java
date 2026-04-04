@@ -15,31 +15,33 @@ public final class CrawlerBuilderFactory {
         return new Configuration().poll(source);
     }
 
-    public static Configuration watchdogUrl(String url) {
-        return new Configuration(url);
+    public static Configuration watchdog(String url, String moduleId) {
+        return new Configuration(url, moduleId);
     }
 
     public static final class Configuration {
         private final String watchdogUrl;
+        private final String moduleId;
 
-        private Configuration(String watchdogUrl) {
+        private Configuration(String watchdogUrl, String moduleId) {
             this.watchdogUrl = watchdogUrl;
+            this.moduleId = moduleId;
         }
 
         private Configuration() {
-            this(null);
+            this(null, "crawler");
         }
 
         public <R> PollingCrawlerBuilder<R> poll(PollSource<R> source) {
-            return new PollingCrawlerBuilder<>(source, buildHeartbeat(watchdogUrl));
+            return new PollingCrawlerBuilder<>(source, buildHeartbeat(watchdogUrl, moduleId));
         }
     }
 
-    private static ModuleHeartBeat buildHeartbeat(String watchdogUrl) {
+    private static ModuleHeartBeat buildHeartbeat(String watchdogUrl, String moduleId) {
         return Objects.isNull(watchdogUrl) ?
                 ModuleHeartBeat.NOOP : new PollingHeartbeat(
                 new HttpWatchdogClient(watchdogUrl),
-                ModuleIdentity.random("crawler")
+                ModuleIdentity.of(moduleId)
         );
     }
 }

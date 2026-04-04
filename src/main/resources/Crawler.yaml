@@ -1,40 +1,49 @@
-spool:
-  infrastructure:
-    event-bus:
-      in-memory:
-        url: localhost:9092
-    inbox:
-      sql:
-        database: spool
-        user: spool
-        password: spool
-  crawlers:
-    - id: gemini-market
-      poll:
-        source:
-          id: gemini-market
-          http:
-            url: https://api.gemini.com/v2/ticker/BTCUSD
-            method: GET
-        schedule:
-          every: 5
-        format: JSON_OBJECT
-        event-mapping:
-          naming-convention: SNAKE_CASE
-          partition-attributes:
-            - symbol
+infrastructure:
+  watchdog:
+    url: "http://localhost:8090"
+  
+  eventBus:
+    type: "IN_MEMORY"
+  
+  inbox:
+    sql:
+      type: "postgresql"
+      host: "localhost"
+      database: "spool"
+      user: "spool"
+      password: "spool"
 
-    - id: gemini-market-v2
-      poll:
-        source:
-          id: gemini-market
+  dataLake: {}
+
+spoolModuleList:
+  - crawler:
+      id: "gemini-market"
+      source:
+        id: "gemini-market"
+        poll:
           http:
-            url: https://api.gemini.com/v1/trades/BTCUSD?limit_trades=100
-            method: GET
-        schedule:
-          every: 60
-        format: JSON_ARRAY
-        event-mapping:
-          naming-convention: SNAKE_CASE
-          partition-attributes:
-            - symbol
+            url: "https://api.gemini.com/v2/ticker/BTCUSD"
+          schedule:
+            every: 5
+            unit: "SECONDS"
+        format: "JSON_OBJECT"
+      eventMapping:
+        namingConvention: "SNAKE_CASE"
+        attributeList:
+          - value: "symbol"
+
+  - crawler:
+      id: "gemini-market-v2"
+      source:
+        id: "gemini-market"
+        poll:
+          http:
+            url: "https://api.gemini.com/v1/trades/BTCUSD?limit_trades=100"
+          schedule:
+            every: 60
+            unit: "SECONDS"
+        format: "JSON_ARRAY"
+      eventMapping:
+        namingConvention: "SNAKE_CASE"
+        attributeList:
+          - value: "symbol"

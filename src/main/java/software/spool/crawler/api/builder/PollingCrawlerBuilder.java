@@ -7,6 +7,7 @@ import software.spool.core.utils.polling.PollingConfiguration;
 import software.spool.core.utils.routing.ErrorRouter;
 import software.spool.crawler.api.Crawler;
 import software.spool.crawler.api.port.source.PollSource;
+import software.spool.crawler.api.utils.CrawlerErrorRouter;
 import software.spool.crawler.api.utils.CrawlerPorts;
 import software.spool.crawler.api.utils.TransformerFormat;
 import software.spool.crawler.internal.control.ItemCapturedHandler;
@@ -54,13 +55,15 @@ public class PollingCrawlerBuilder<I> {
 
     public <T, O> Crawler createWith(Transformer<T, O> transformer) {
         validateRequiredFields();
-        if (eventMapping.hasConflict())
-            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
-        return new Crawler(initializeStrategy(transformer, initializeHandler()), errorRouter, heartBeat);
+        return new Crawler(initializeStrategy(transformer, initializeHandler()), getErrorRouter(), heartBeat);
     }
 
     private <T, O> PollingCrawlerStrategy<I, T, O> initializeStrategy(Transformer<T, O> transformer, Handler<String> handler) {
-        return new PollingCrawlerStrategy<>(source, transformer, handler, schedule, errorRouter);
+        return new PollingCrawlerStrategy<>(source, transformer, handler, schedule, getErrorRouter());
+    }
+
+    private ErrorRouter getErrorRouter() {
+        return Objects.requireNonNullElse(errorRouter, CrawlerErrorRouter.defaults(ports.bus()));
     }
 
     private ItemCapturedHandler initializeHandler() {
@@ -68,7 +71,7 @@ public class PollingCrawlerBuilder<I> {
                 source.sourceId(), ports,
                 eventMapping.buildEmitter(ports.bus()),
                 eventMapping.partitionAttributes(),
-                errorRouter);
+                getErrorRouter());
     }
 
     public <T, O> Crawler createWith(TransformerFormat<T, O> format) {

@@ -1,6 +1,5 @@
 package software.spool.crawler.api.utils;
 
-import software.spool.crawler.api.port.source.PollSource;
 import software.spool.crawler.internal.utils.factory.Transformer;
 
 /**
@@ -21,7 +20,7 @@ import software.spool.crawler.internal.utils.factory.Transformer;
  *
  * <p>
  * Pre-built formats are available in
- * {@link Formats}.
+ * {@link StandardFormat}.
  * Custom formats can be created by implementing this interface:
  * </p>
  * 
@@ -33,6 +32,7 @@ import software.spool.crawler.internal.utils.factory.Transformer;
  * @param <T> the intermediate parsed type after deserialization
  * @param <O> the individual record type produced by the splitter
  */
+@FunctionalInterface
 public interface TransformerFormat<T, O> {
 
     /**
