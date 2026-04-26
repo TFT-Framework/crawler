@@ -1,6 +1,9 @@
 package software.spool.crawler.api.builder;
 
+import software.spool.core.adapter.jackson.RecordSerializerFactory;
+import software.spool.core.adapter.otel.OpenTelemetryMetricsRegistry;
 import software.spool.core.port.bus.Handler;
+import software.spool.core.port.metrics.MetricsRegistry;
 import software.spool.core.port.serde.EnrichmentRule;
 import software.spool.core.port.serde.NamingConvention;
 import software.spool.core.port.watchdog.ModuleHeartBeat;
@@ -12,6 +15,11 @@ import software.spool.crawler.api.utils.CrawlerErrorRouter;
 import software.spool.crawler.api.utils.CrawlerPorts;
 import software.spool.crawler.api.utils.NormalizerFormat;
 import software.spool.crawler.internal.control.ItemCapturedHandler;
+import software.spool.crawler.internal.control.PayloadCapturedHandler;
+import software.spool.crawler.internal.control.pipeline.ObservedStep;
+import software.spool.crawler.internal.control.pipeline.Pipeline;
+import software.spool.crawler.internal.control.pipeline.PipelineContext;
+import software.spool.crawler.internal.control.pipeline.steps.*;
 import software.spool.crawler.internal.port.decorator.SafePollSource;
 import software.spool.crawler.internal.strategy.PollingCrawlerStrategy;
 import software.spool.crawler.internal.utils.factory.Normalizer;
@@ -69,7 +77,7 @@ public class PollingCrawlerBuilder<I> {
 
     public <P, E, R> Crawler createWith(Normalizer<P, E, R> normalizer) {
         validateRequiredFields();
-        return new Crawler(initializeStrategy(normalizer, initializeHandler()), getErrorRouter(), heartBeat);
+        return new Crawler(initializeStrategy(normalizer, initHandler()), getErrorRouter(), heartBeat);
     }
 
     private <P, E, R> PollingCrawlerStrategy<I, P, E, R> initializeStrategy(Normalizer<P, E, R> normalizer, Handler<String> handler) {
@@ -78,6 +86,29 @@ public class PollingCrawlerBuilder<I> {
 
     private ErrorRouter getErrorRouter() {
         return Objects.requireNonNullElse(errorRouter, CrawlerErrorRouter.defaults(ports.bus()));
+    }
+
+    private PayloadCapturedHandler initHandler() {
+        return new PayloadCapturedHandler(initializePipeline(), source.sourceId(), getErrorRouter());
+    }
+
+    private Pipeline<PipelineContext, PipelineContext> initializePipeline() {
+        return Pipeline.<PipelineContext>start()
+                .add(new ObservedStep<>("measure-size", new PayloadSizeMetricStep(buildHistogram())))
+                .add(new ObservedStep<>("build-captured", new BuildCapturedEventStep()))
+                .add(new ObservedStep<>("emit-domain-event",
+                        new PublishDomainEventStep(eventMapping.buildEmitter(ports.bus()))))
+                .add(new ObservedStep<>("publish-captured", new PublishCapturedEvent(ports.bus())))
+                .add(new ObservedStep<>("store-envelope",
+                        new BuildAndStoreEnvelopeStep(ports.inboxWriter(),
+                                RecordSerializerFactory.record(),
+                                eventMapping.partitionAttributes())))
+                .add(new ObservedStep<>("publish-stored", new PublishEnvelopeStoredStep(ports.bus())));
+    }
+
+    private MetricsRegistry.LongHistogramMetric buildHistogram() {
+        return new OpenTelemetryMetricsRegistry()
+                .histogram("spool.captured.payload.size", "", "By");
     }
 
     private ItemCapturedHandler initializeHandler() {

@@ -1,6 +1,7 @@
 package software.spool.crawler.internal.control.pipeline.steps;
 
 import software.spool.core.port.metrics.MetricsRegistry;
+import software.spool.crawler.internal.control.pipeline.PipelineContext;
 import software.spool.crawler.internal.control.pipeline.Step;
 
 import javax.management.AttributeNotFoundException;

@@ -5,6 +5,7 @@ import software.spool.core.model.EnvelopeStatus;
 import software.spool.core.model.vo.*;
 import software.spool.core.port.serde.RecordSerializer;
 import software.spool.crawler.api.port.InboxWriter;
+import software.spool.crawler.internal.control.pipeline.PipelineContext;
 import software.spool.crawler.internal.control.pipeline.Step;
 import software.spool.crawler.internal.utils.TypedDomainMapping;
 
@@ -26,14 +27,10 @@ public class BuildAndStoreEnvelopeStep implements Step<PipelineContext, Pipeline
 
     @Override
     public PipelineContext apply(PipelineContext ctx) throws AttributeNotFoundException {
-        try {
-            IdempotencyKey key = inboxWriter.receive(buildEnvelope(ctx));
-            if (key == null)
-                throw new DuplicateEventException(ctx.require(CapturedPayloadKeys.CAPTURED_EVENT).idempotencyKey());
-            return ctx.with(CapturedPayloadKeys.RECEIVED_KEY, key);
-        } catch (Exception e) {
-            throw e;
-        }
+        IdempotencyKey key = inboxWriter.receive(buildEnvelope(ctx));
+        if (key == null)
+            throw new DuplicateEventException(ctx.require(CapturedPayloadKeys.CAPTURED_EVENT).idempotencyKey());
+        return ctx.with(CapturedPayloadKeys.RECEIVED_KEY, key);
     }
 
     private Envelope buildEnvelope(PipelineContext ctx) throws AttributeNotFoundException {

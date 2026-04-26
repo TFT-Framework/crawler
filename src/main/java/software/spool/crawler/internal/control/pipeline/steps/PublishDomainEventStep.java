@@ -1,5 +1,6 @@
 package software.spool.crawler.internal.control.pipeline.steps;
 
+import software.spool.crawler.internal.control.pipeline.PipelineContext;
 import software.spool.crawler.internal.control.pipeline.Step;
 import software.spool.crawler.internal.utils.DomainEventEmitter;
 import software.spool.crawler.internal.utils.TypedDomainMapping;

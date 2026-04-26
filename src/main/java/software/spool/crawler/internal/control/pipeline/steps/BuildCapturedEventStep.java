@@ -2,6 +2,7 @@ package software.spool.crawler.internal.control.pipeline.steps;
 
 import software.spool.core.model.event.SourcePayloadCaptured;
 import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.crawler.internal.control.pipeline.PipelineContext;
 import software.spool.crawler.internal.control.pipeline.Step;
 
 import javax.management.AttributeNotFoundException;

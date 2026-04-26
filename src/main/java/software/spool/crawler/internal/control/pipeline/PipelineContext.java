@@ -1,6 +1,4 @@
-package software.spool.crawler.internal.control.pipeline.steps;
-
-import software.spool.crawler.internal.control.pipeline.ContextKey;
+package software.spool.crawler.internal.control.pipeline;
 
 import javax.management.AttributeNotFoundException;
 import java.util.Collections;
