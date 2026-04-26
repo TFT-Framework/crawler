@@ -1,53 +1,47 @@
 package software.spool.crawler.api.builder;
 
+import software.spool.core.adapter.watchdog.HttpWatchdogClient;
+import software.spool.core.model.watchdog.ModuleIdentity;
+import software.spool.core.port.watchdog.ModuleHeartBeat;
+import software.spool.core.utils.polling.PollingHeartbeat;
 import software.spool.crawler.api.port.source.PollSource;
-import software.spool.crawler.api.adapter.InMemoryInboxWriter;
 
-/**
- * Entry point of the crawler DSL.
- *
- * <p>
- * Use the static factory methods in this class to start building a
- * {@link software.spool.crawler.api.strategy.CrawlerStrategy} in a
- * fluent, readable way:
- * </p>
- * 
- * <pre>{@code
- * CrawlerStrategy strategy = Crawlers.poll(mySource)
- *         .withFormat(Formats.JSON_ARRAY)
- *         .inbox(myInboxWriter)
- *         .bus(myEventBus)
- *         .senderName("my-crawler")
- *         .create();
- * }</pre>
- *
- * <p>
- * The default ports injected when not explicitly configured are:
- * <ul>
- * <li><b>bus</b> – prints events to {@code System.out}</li>
- * <li><b>inbox</b> – {@link InMemoryInboxWriter} (suitable for local
- * testing)</li>
- * </ul>
- */
+import java.util.Objects;
+
 public final class CrawlerBuilderFactory {
-    private CrawlerBuilderFactory() {
+    private CrawlerBuilderFactory() {}
+
+    public static <R> PollingCrawlerBuilder<R> poll(PollSource<R> source) {
+        return new Configuration().poll(source);
     }
 
-    /**
-     * Starts constructing a poll-based crawler for the given source.
-     *
-     * <p>
-     * The returned {@link PollSourceBuilder} allows further configuration of the
-     * processing format, ports, and sender name before calling
-     * {@link PollSourceBuilder#create()} to obtain the final
-     * {@link software.spool.crawler.api.strategy.CrawlerStrategy}.
-     * </p>
-     *
-     * @param <R>    the raw type produced by the source on each poll
-     * @param source the poll source to crawl; must not be {@code null}
-     * @return a fluent builder step for completing the crawler configuration
-     */
-    public static <R> PollSourceBuilder<R, R, R> poll(PollSource<R> source) {
-        return new PollSourceBuilder<>(source);
+    public static Configuration watchdog(String url, String moduleId) {
+        return new Configuration(url, moduleId);
+    }
+
+    public static final class Configuration {
+        private final String watchdogUrl;
+        private final String moduleId;
+
+        private Configuration(String watchdogUrl, String moduleId) {
+            this.watchdogUrl = watchdogUrl;
+            this.moduleId = moduleId;
+        }
+
+        private Configuration() {
+            this(null, "crawler");
+        }
+
+        public <R> PollingCrawlerBuilder<R> poll(PollSource<R> source) {
+            return new PollingCrawlerBuilder<>(source, buildHeartbeat(watchdogUrl, moduleId));
+        }
+    }
+
+    private static ModuleHeartBeat buildHeartbeat(String watchdogUrl, String moduleId) {
+        return Objects.isNull(watchdogUrl) ?
+                ModuleHeartBeat.NOOP : new PollingHeartbeat(
+                new HttpWatchdogClient(watchdogUrl),
+                ModuleIdentity.of(moduleId)
+        );
     }
 }

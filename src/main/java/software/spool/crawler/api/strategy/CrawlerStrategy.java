@@ -1,6 +1,7 @@
 package software.spool.crawler.api.strategy;
 
 import software.spool.core.exception.SpoolException;
+import software.spool.core.utils.polling.CancellationToken;
 import software.spool.crawler.api.builder.CrawlerBuilderFactory;
 
 /**
@@ -27,19 +28,5 @@ import software.spool.crawler.api.builder.CrawlerBuilderFactory;
  * }</pre>
  */
 public interface CrawlerStrategy {
-    /**
-     * Runs one complete crawler cycle.
-     *
-     * <p>
-     * Implementations should fetch data from their source, apply the processing
-     * pipeline, and route the results to the inbox and event bus. Errors are
-     * expected to be handled internally via an
-     * {@link software.spool.core.utils.ErrorRouter ErrorRouter}
-     * rather than propagated to the caller whenever possible.
-     * </p>
-     *
-     * @throws SpoolException if an unrecoverable error occurs that cannot be
-     *                        handled by the internal error router
-     */
-    void execute() throws SpoolException;
+    void execute(CancellationToken token) throws SpoolException;
 }

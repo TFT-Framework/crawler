@@ -68,6 +68,20 @@ public class PayloadSplitterFactory {
                 false);
     }
 
+    public static PayloadSplitter<JsonNode, JsonNode> withRootPath(String rootPath) {
+        return parsed -> {
+            JsonNode target = parsed.at(rootPath);
+            if (target.isMissingNode())
+                throw new SplitException(
+                        "Path not found: " + rootPath, parsed.toString());
+            if (!target.isArray())
+                throw new SplitException(
+                        "Expected array at " + rootPath + ", got: " + target.getNodeType().name(),
+                        target.toString());
+            return StreamSupport.stream(target.spliterator(), false);
+        };
+    }
+
     /**
      * {@link Iterator} that lazily advances a {@link ResultSet} and converts each
      * row to a {@code Map<String, Object>}.

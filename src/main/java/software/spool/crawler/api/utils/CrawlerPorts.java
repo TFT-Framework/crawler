@@ -1,8 +1,9 @@
 package software.spool.crawler.api.utils;
 
-import software.spool.core.port.EventBusEmitter;
-import software.spool.core.utils.ErrorRouter;
+import software.spool.core.port.bus.EventPublisher;
+import software.spool.core.port.decorator.SafeEventPublisher;
 import software.spool.crawler.api.port.InboxWriter;
+import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
 
 /**
  * Aggregates the external ports required by a crawler strategy into a single
@@ -22,13 +23,11 @@ import software.spool.crawler.api.port.InboxWriter;
  */
 public class CrawlerPorts {
     private final InboxWriter inboxWriter;
-    private final EventBusEmitter bus;
-    private final ErrorRouter errorRouter;
+    private final EventPublisher bus;
 
     private CrawlerPorts(Builder builder) {
         this.inboxWriter = builder.inboxWriter;
         this.bus = builder.bus;
-        this.errorRouter = builder.errorRouter;
     }
 
     /**
@@ -40,23 +39,10 @@ public class CrawlerPorts {
         return inboxWriter;
     }
 
-    /**
-     * Returns the {@link EventBusEmitter} port.
-     *
-     * @return the event bus emitter; may be {@code null} if not configured
-     */
-    public EventBusEmitter bus() {
+    public EventPublisher bus() {
         return bus;
     }
 
-    /**
-     * Returns the {@link ErrorRouter} that handles exceptions during crawling.
-     *
-     * @return the error router; may be {@code null} to use the strategy default
-     */
-    public ErrorRouter errorRouter() {
-        return errorRouter;
-    }
 
     /**
      * Returns a new {@link Builder} for constructing a {@code CrawlerPorts}
@@ -73,8 +59,7 @@ public class CrawlerPorts {
      */
     public static class Builder {
         private InboxWriter inboxWriter;
-        private EventBusEmitter bus;
-        private ErrorRouter errorRouter;
+        private EventPublisher bus;
 
         /** Creates a new empty builder. */
         Builder() {
@@ -87,30 +72,18 @@ public class CrawlerPorts {
          * @return this builder for chaining
          */
         public Builder inbox(InboxWriter inboxWriter) {
-            this.inboxWriter = inboxWriter;
+            this.inboxWriter = SafeInboxWriter.of(inboxWriter);
             return this;
         }
 
         /**
-         * Sets the {@link EventBusEmitter} port.
+         * Sets the {@link EventPublisher} port.
          *
          * @param bus the event bus emitter to use
          * @return this builder for chaining
          */
-        public Builder bus(EventBusEmitter bus) {
-            this.bus = bus;
-            return this;
-        }
-
-        /**
-         * Sets the error router.
-         *
-         * @param errorRouter the error router to use; pass {@code null} to use the
-         *                    strategy's default routing table
-         * @return this builder for chaining
-         */
-        public Builder errorRouter(ErrorRouter errorRouter) {
-            this.errorRouter = errorRouter;
+        public Builder bus(EventPublisher bus) {
+            this.bus = SafeEventPublisher.of(bus);
             return this;
         }
 

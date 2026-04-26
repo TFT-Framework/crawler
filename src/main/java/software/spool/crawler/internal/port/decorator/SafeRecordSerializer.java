@@ -2,7 +2,7 @@ package software.spool.crawler.internal.port.decorator;
 
 import software.spool.core.exception.SerializationException;
 import software.spool.core.exception.SpoolException;
-import software.spool.core.port.RecordSerializer;
+import software.spool.core.port.serde.RecordSerializer;
 
 /**
  * Decorator for {@link RecordSerializer} that normalises unchecked exceptions

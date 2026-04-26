@@ -2,7 +2,7 @@ package software.spool.crawler.internal.port.decorator;
 
 import software.spool.core.exception.DeserializationException;
 import software.spool.core.exception.SpoolException;
-import software.spool.core.port.PayloadDeserializer;
+import software.spool.core.port.serde.PayloadDeserializer;
 
 /**
  * Decorator for {@link PayloadDeserializer} that normalises unchecked exceptions
@@ -41,7 +41,7 @@ public class SafePayloadDeserializer<T> implements PayloadDeserializer<T> {
         } catch (SpoolException e) {
             throw e;
         } catch (Exception e) {
-            throw new DeserializationException(payload, e);
+            throw new DeserializationException(payload, e.getMessage());
         }
     }
 }

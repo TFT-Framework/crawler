@@ -18,7 +18,7 @@
   - [HTTP JSON Array](#http-json-array)
   - [YAML Source](#yaml-source)
   - [SQL ResultSet](#sql-resultset)
-  - [Custom Transformer Pipeline](#custom-transformer-pipeline)
+  - [Custom Transformer Pipeline](#custom-normalizer-pipeline)
   - [Domain Event Mapping](#domain-event-mapping)
   - [Custom Ports (InboxWriter + EventBus)](#custom-ports-inboxwriter--eventbus)
   - [Custom Error Routing](#custom-error-routing)

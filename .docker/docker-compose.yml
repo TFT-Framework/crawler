@@ -1,35 +1,22 @@
+name: spool-infrastructure
+
 services:
 
-  # Pull desde base de datos
   postgres:
     image: postgres:16-alpine
     container_name: spool-postgres
     environment:
-      POSTGRES_USER: spool_user
-      POSTGRES_PASSWORD: spool_pass
-      POSTGRES_DB: spool_db
+      POSTGRES_USER: spool
+      POSTGRES_PASSWORD: spool
+      POSTGRES_DB: spool
     ports:
       - "5432:5432"
-    volumes:
-      - ./postgres/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U spool_user -d spool_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U spool -d spool" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    profiles: [ pull-db ]
 
-  # Pull desde API REST
-  mock-rest-api:
-    image: wiremock/wiremock:latest
-    container_name: spool-mock-api
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./wiremock:/home/wiremock
-    profiles: [pull-api]
-
-  # Stream desde Kafka
   kafka:
     image: apache/kafka:3.9.0
     container_name: spool-kafka
@@ -37,7 +24,7 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://host.docker.internal:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@spool-kafka:9093
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
@@ -46,14 +33,62 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
     ports:
       - "9092:9092"
-    profiles: [ stream ]
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: spool-zookeeper
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: spool-tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "3200:3200"
+
+  loki:
+    image: grafana/loki:3.3.0
+    container_name: spool-loki
+    command: [ "-config.file=/etc/loki/loki.yaml" ]
+    volumes:
+      - ./loki.yaml:/etc/loki/loki.yaml:ro
+    ports:
+      - "3100:3100"
+
+  mimir:
+    image: grafana/mimir:2.14.0
+    container_name: spool-mimir
+    command: [ "-config.file=/etc/mimir/mimir.yaml" ]
+    volumes:
+      - ./mimir.yaml:/etc/mimir/mimir.yaml:ro
+    ports:
+      - "9009:9009"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    container_name: spool-otel-collector
+    command: [ "--config=/etc/otel-collector.yaml" ]
+    volumes:
+      - ./otel-collector.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4319:4317"
+      - "4320:4318"
+    depends_on:
+      - tempo
+      - loki
+      - mimir
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: spool-grafana
+    volumes:
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+    ports:
+      - "3000:3000"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    profiles: [stream]
-
-volumes:
-  postgres_data:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
+    depends_on:
+      - tempo
+      - loki
+      - mimir

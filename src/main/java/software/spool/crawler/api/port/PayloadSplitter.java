@@ -19,11 +19,11 @@ import java.util.stream.Stream;
  * {@link PayloadSplitterFactory}.
  * </p>
  *
- * @param <I> the intermediate type produced by the deserializer
- * @param <O> the individual record type produced by splitting
+ * @param <P> the intermediate type produced by the deserializer
+ * @param <R> the individual record type produced by splitting
  */
 @FunctionalInterface
-public interface PayloadSplitter<I, O> {
+public interface PayloadSplitter<P, R> {
     /**
      * Splits the parsed payload into a stream of individual records.
      *
@@ -32,5 +32,5 @@ public interface PayloadSplitter<I, O> {
      * @throws SpoolException if the payload structure is incompatible with this
      *                        splitter
      */
-    Stream<O> split(I payload) throws SpoolException;
+    Stream<R> split(P payload) throws SpoolException;
 }

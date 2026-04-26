@@ -1,0 +1,68 @@
+package software.spool.crawler.api.builder;
+
+import software.spool.core.adapter.jackson.PayloadDeserializerFactory;
+import software.spool.core.model.Event;
+import software.spool.core.model.vo.IdempotencyKey;
+import software.spool.core.port.bus.EventPublisher;
+import software.spool.core.port.serde.NamingConvention;
+import software.spool.core.port.serde.PayloadDeserializer;
+import software.spool.core.utils.serialization.DomainEventMapping;
+import software.spool.crawler.internal.utils.DomainEventEmitter;
+import software.spool.crawler.internal.utils.TypedDomainMapping;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+public class EventMappingSpecification {
+    private final NamingConvention namingConvention;
+    private final List<TypedDomainMapping> domainMappings;
+    private final List<String> defaultPartitionAttributes;
+
+    public EventMappingSpecification(NamingConvention namingConvention) {
+        this.namingConvention = namingConvention;
+        this.domainMappings = new ArrayList<>();
+        this.defaultPartitionAttributes = new ArrayList<>();
+    }
+
+    private <D> PayloadDeserializer<D> deserializerFor(Class<D> type) {
+        return PayloadDeserializerFactory.json().convention(this.namingConvention).as(type);
+    }
+
+    public EventMappingSpecification addDomainEvent(Class<? extends Event> eventType, String... partitionAttributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
+        domainMappings.add(new TypedDomainMapping(eventType,
+                DomainEventMapping.of(deserializerFor(eventType)),
+                List.of(partitionAttributes)));
+        return this;
+    }
+
+    public <D> EventMappingSpecification addDomainEvent(Class<D> dtoType, BiFunction<D, IdempotencyKey, Event> toEvent, String... partitionAttributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
+        domainMappings.add(new TypedDomainMapping(dtoType,
+                DomainEventMapping.of(deserializerFor(dtoType), toEvent),
+                List.of(partitionAttributes)));
+        return this;
+    }
+
+    public EventMappingSpecification addPartitionAttributes(String... attributes) {
+        if (hasConflict())
+            throw new IllegalArgumentException("Only one can be used at the same time. Please, use addDomainEvent(...) or addPartitionAttributes(...) but not both.");
+        defaultPartitionAttributes.addAll(List.of(attributes));
+        return this;
+    }
+
+    public boolean hasConflict() {
+        return !domainMappings.isEmpty() && !defaultPartitionAttributes.isEmpty();
+    }
+
+    public DomainEventEmitter buildEmitter(EventPublisher bus) {
+        return new DomainEventEmitter(bus, domainMappings);
+    }
+
+    public List<String> partitionAttributes() {
+        return defaultPartitionAttributes;
+    }
+}

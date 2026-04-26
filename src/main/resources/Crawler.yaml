@@ -1,0 +1,56 @@
+infrastructure:
+  watchdog:
+    url: "http://localhost:8090"
+  
+  eventBus:
+    type: "IN_MEMORY"
+  
+  inbox:
+    sql:
+      type: "postgresql"
+      host: "localhost"
+      database: "spool"
+      user: "spool"
+      password: "spool"
+
+  dataLake: {}
+
+spoolModuleList:
+  - crawler:
+      id: "gemini-market"
+      source:
+        id: "gemini-market"
+        poll:
+          http:
+            url: "https://api.gemini.com/v2/ticker/BTCUSD"
+          schedule:
+            every: 5
+            unit: "SECONDS"
+        format: "JSON_OBJECT"
+      eventMapping:
+        namingConvention: "SNAKE_CASE"
+        attributeList:
+          - value: "symbol"
+
+  - crawler:
+      id: "gemini-market-v2"
+      source:
+        id: "gemini-market"
+        poll:
+          http:
+            url: "https://api.gemini.com/v1/trades/BTCUSD?limit_trades=100"
+          schedule:
+            every: 60
+            unit: "SECONDS"
+        format: "JSON_ARRAY"
+      eventMapping:
+        namingConvention: "SNAKE_CASE"
+        attributeList:
+          - value: "symbol"
+
+  - feeder:
+    id: "gemini-feeder"
+    workers: 4
+    poll:
+      every: 5
+      unit: "SECONDS"
