@@ -3,7 +3,7 @@ package software.spool.crawler.internal.port.decorator;
 import software.spool.core.exception.InboxWriteException;
 import software.spool.core.exception.SpoolException;
 import software.spool.core.model.vo.IdempotencyKey;
-import software.spool.core.model.vo.InboxItem;
+import software.spool.core.model.vo.Envelope;
 import software.spool.crawler.api.port.InboxWriter;
 
 /**
@@ -33,9 +33,9 @@ public class SafeInboxWriter implements InboxWriter {
     }
 
     @Override
-    public IdempotencyKey receive(InboxItem item) throws InboxWriteException {
+    public IdempotencyKey receive(Envelope envelope) throws InboxWriteException {
         try {
-            return inbox.receive(item);
+            return inbox.receive(envelope);
         } catch (SpoolException e) {
             throw e;
         } catch (Exception e) {

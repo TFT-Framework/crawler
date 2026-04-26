@@ -1,7 +1,7 @@
 package software.spool.crawler.api.utils;
 
-import software.spool.core.port.bus.EventBusEmitter;
-import software.spool.core.port.decorator.SafeEventBusEmitter;
+import software.spool.core.port.bus.EventPublisher;
+import software.spool.core.port.decorator.SafeEventPublisher;
 import software.spool.crawler.api.port.InboxWriter;
 import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
 
@@ -23,7 +23,7 @@ import software.spool.crawler.internal.port.decorator.SafeInboxWriter;
  */
 public class CrawlerPorts {
     private final InboxWriter inboxWriter;
-    private final EventBusEmitter bus;
+    private final EventPublisher bus;
 
     private CrawlerPorts(Builder builder) {
         this.inboxWriter = builder.inboxWriter;
@@ -39,12 +39,7 @@ public class CrawlerPorts {
         return inboxWriter;
     }
 
-    /**
-     * Returns the {@link EventBusEmitter} port.
-     *
-     * @return the event bus emitter; may be {@code null} if not configured
-     */
-    public EventBusEmitter bus() {
+    public EventPublisher bus() {
         return bus;
     }
 
@@ -64,7 +59,7 @@ public class CrawlerPorts {
      */
     public static class Builder {
         private InboxWriter inboxWriter;
-        private EventBusEmitter bus;
+        private EventPublisher bus;
 
         /** Creates a new empty builder. */
         Builder() {
@@ -82,13 +77,13 @@ public class CrawlerPorts {
         }
 
         /**
-         * Sets the {@link EventBusEmitter} port.
+         * Sets the {@link EventPublisher} port.
          *
          * @param bus the event bus emitter to use
          * @return this builder for chaining
          */
-        public Builder bus(EventBusEmitter bus) {
-            this.bus = SafeEventBusEmitter.of(bus);
+        public Builder bus(EventPublisher bus) {
+            this.bus = SafeEventPublisher.of(bus);
             return this;
         }
 

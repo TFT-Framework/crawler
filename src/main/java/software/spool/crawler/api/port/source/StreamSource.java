@@ -1,7 +1,7 @@
 package software.spool.crawler.api.port.source;
 
 import software.spool.core.exception.SpoolException;
-import software.spool.core.model.event.SourceItemCaptured;
+import software.spool.core.model.event.SourcePayloadCaptured;
 
 import java.util.function.Consumer;
 
@@ -39,7 +39,7 @@ public interface StreamSource<R> extends Source {
      *                  must not be {@code null}
      * @throws SpoolException if the stream could not be started
      */
-    void start(Consumer<SourceItemCaptured> onMessage, Consumer<Exception> onError) throws SpoolException;
+    void start(Consumer<SourcePayloadCaptured> onMessage, Consumer<Exception> onError) throws SpoolException;
 
     /**
      * Stops the stream and releases any underlying resources.

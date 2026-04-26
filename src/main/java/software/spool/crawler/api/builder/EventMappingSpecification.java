@@ -3,7 +3,7 @@ package software.spool.crawler.api.builder;
 import software.spool.core.adapter.jackson.PayloadDeserializerFactory;
 import software.spool.core.model.Event;
 import software.spool.core.model.vo.IdempotencyKey;
-import software.spool.core.port.bus.EventBusEmitter;
+import software.spool.core.port.bus.EventPublisher;
 import software.spool.core.port.serde.NamingConvention;
 import software.spool.core.port.serde.PayloadDeserializer;
 import software.spool.core.utils.serialization.DomainEventMapping;
@@ -58,7 +58,7 @@ public class EventMappingSpecification {
         return !domainMappings.isEmpty() && !defaultPartitionAttributes.isEmpty();
     }
 
-    public DomainEventEmitter buildEmitter(EventBusEmitter bus) {
+    public DomainEventEmitter buildEmitter(EventPublisher bus) {
         return new DomainEventEmitter(bus, domainMappings);
     }
 
