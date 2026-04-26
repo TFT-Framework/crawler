@@ -1,9 +1,9 @@
-package software.spool.crawler.internal.control.pipeline.steps;
+package software.spool.crawler.internal.control.steps;
 
 import software.spool.core.model.event.SourcePayloadCaptured;
 import software.spool.core.model.vo.IdempotencyKey;
-import software.spool.crawler.internal.control.pipeline.PipelineContext;
-import software.spool.crawler.internal.control.pipeline.Step;
+import software.spool.core.pipeline.PipelineContext;
+import software.spool.core.pipeline.Step;
 
 import javax.management.AttributeNotFoundException;
 import java.util.UUID;

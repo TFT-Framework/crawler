@@ -1,8 +1,8 @@
-package software.spool.crawler.internal.control.pipeline.steps;
+package software.spool.crawler.internal.control.steps;
 
+import software.spool.core.pipeline.PipelineContext;
+import software.spool.core.pipeline.Step;
 import software.spool.core.port.metrics.MetricsRegistry;
-import software.spool.crawler.internal.control.pipeline.PipelineContext;
-import software.spool.crawler.internal.control.pipeline.Step;
 
 import javax.management.AttributeNotFoundException;
 import java.util.Map;

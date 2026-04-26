@@ -1,10 +1,10 @@
 package software.spool.crawler.internal.control;
 
+import software.spool.core.pipeline.Pipeline;
+import software.spool.core.pipeline.PipelineContext;
 import software.spool.core.port.bus.Handler;
 import software.spool.core.utils.routing.ErrorRouter;
-import software.spool.crawler.internal.control.pipeline.Pipeline;
-import software.spool.crawler.internal.control.pipeline.steps.CapturedPayloadKeys;
-import software.spool.crawler.internal.control.pipeline.PipelineContext;
+import software.spool.crawler.internal.control.steps.CapturedPayloadKeys;
 
 public class PayloadCapturedHandler implements Handler<String> {
     private final Pipeline<PipelineContext, PipelineContext> pipeline;

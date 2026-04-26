@@ -1,11 +1,11 @@
-package software.spool.crawler.internal.control.pipeline.steps;
+package software.spool.crawler.internal.control.steps;
 
 import software.spool.core.model.event.EnvelopeStored;
+import software.spool.core.pipeline.PipelineContext;
+import software.spool.core.pipeline.Step;
 import software.spool.core.port.bus.BrokerMessage;
 import software.spool.core.port.bus.Destination;
 import software.spool.core.port.bus.EventPublisher;
-import software.spool.crawler.internal.control.pipeline.PipelineContext;
-import software.spool.crawler.internal.control.pipeline.Step;
 
 import javax.management.AttributeNotFoundException;
 import java.util.Map;

@@ -1,8 +1,8 @@
-package software.spool.crawler.internal.control.pipeline.steps;
+package software.spool.crawler.internal.control.steps;
 
 import software.spool.core.model.event.SourcePayloadCaptured;
 import software.spool.core.model.vo.IdempotencyKey;
-import software.spool.crawler.internal.control.pipeline.ContextKey;
+import software.spool.core.pipeline.ContextKey;
 import software.spool.crawler.internal.utils.TypedDomainMapping;
 import java.util.Optional;
 

@@ -1,12 +1,12 @@
-package software.spool.crawler.internal.control.pipeline.steps;
+package software.spool.crawler.internal.control.steps;
 
 import software.spool.core.exception.DuplicateEventException;
 import software.spool.core.model.EnvelopeStatus;
 import software.spool.core.model.vo.*;
+import software.spool.core.pipeline.PipelineContext;
+import software.spool.core.pipeline.Step;
 import software.spool.core.port.serde.RecordSerializer;
 import software.spool.crawler.api.port.InboxWriter;
-import software.spool.crawler.internal.control.pipeline.PipelineContext;
-import software.spool.crawler.internal.control.pipeline.Step;
 import software.spool.crawler.internal.utils.TypedDomainMapping;
 
 import javax.management.AttributeNotFoundException;
