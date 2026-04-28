@@ -45,7 +45,8 @@ public class BuildAndStoreEnvelopeStep implements Step<PipelineContext, Pipeline
         Optional<TypedDomainMapping> matched = ctx.require(CapturedPayloadKeys.DOMAIN_MAPPING);
         EventMetadata metadata = new EventMetadata()
                 .set(EventMetadataKey.SOURCE, ctx.require(CapturedPayloadKeys.SOURCE_ID))
-                .set(EventMetadataKey.PARTITION_SCHEMA, serializer.serialize(buildPartitionSchema(ctx)));
+                .set(EventMetadataKey.PARTITION_SCHEMA, serializer.serialize(buildPartitionSchema(ctx)))
+                .set(EventMetadataKey.CORRELATION_ID, ctx.require(CapturedPayloadKeys.CAPTURED_EVENT).correlationId());
         matched.map(TypedDomainMapping::targetType)
                 .ifPresent(type -> metadata.set(EventMetadataKey.TYPE, type.toString()));
         return metadata;
