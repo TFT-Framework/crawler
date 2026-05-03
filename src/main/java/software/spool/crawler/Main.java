@@ -1,5 +1,6 @@
 package software.spool.crawler;
 
+import software.spool.core.adapter.jackson.RecordSerializerFactory;
 import software.spool.core.adapter.memory.InMemoryEventBus;
 import software.spool.core.adapter.otel.OTELConfig;
 import software.spool.core.model.spool.SpoolNode;
@@ -19,19 +20,19 @@ import java.time.Duration;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        OTELConfig.init("crawler");
-        InMemoryEventBus broker = new InMemoryEventBus();
-
-        Crawler with = CrawlerBuilderFactory.poll(new HTTPPollSource("https://data.sec.gov/api/xbrl/frames/us-gaap/Assets/USD/CY2023Q4I.json", "test"))
-                .schedule(PollingConfiguration.every(Duration.ofSeconds(10)))
-                .ports(CrawlerPorts.builder()
-                        .inbox(e -> IdempotencyKey.of("sec", e.payload()))
-                        .bus(broker).build())
-                .enrichRules(List.of())
-                .eventMapping(new EventMappingSpecification(NamingConvention.SNAKE_CASE))
-                .withErrorRouter(CrawlerErrorRouter.defaults(broker))
-                .createWith(StandardNormalizer.JSON_OBJECT);
-        SpoolNode.create().register(with).start();
+    public static void main(String[] args) throws Exception {
+//        OTELConfig.init("crawler");
+//        InMemoryEventBus broker = new InMemoryEventBus();
+//
+//        Crawler with = CrawlerBuilderFactory.poll(new HTTPPollSource("https://data.sec.gov/api/xbrl/frames/us-gaap/Assets/USD/CY2023Q4I.json", "test"))
+//                .schedule(PollingConfiguration.every(Duration.ofSeconds(10)))
+//                .ports(CrawlerPorts.builder()
+//                        .inbox(e -> IdempotencyKey.of("sec", e.payload()))
+//                        .bus(broker).build())
+//                .enrichRules(List.of())
+//                .eventMapping(new EventMappingSpecification(NamingConvention.SNAKE_CASE))
+//                .withErrorRouter(CrawlerErrorRouter.defaults(broker))
+//                .createWith(StandardNormalizer.JSON_OBJECT);
+//        SpoolNode.create().register(with).start();
     }
 }

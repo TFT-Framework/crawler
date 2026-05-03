@@ -1,6 +1,7 @@
 package software.spool.crawler.api.builder;
 
 import software.spool.core.adapter.watchdog.HttpWatchdogClient;
+import software.spool.core.adapter.resilience.ResilienceWatchdogClient;
 import software.spool.core.model.watchdog.ModuleIdentity;
 import software.spool.core.port.watchdog.ModuleHeartBeat;
 import software.spool.core.utils.polling.PollingHeartbeat;
@@ -40,7 +41,7 @@ public final class CrawlerBuilderFactory {
     private static ModuleHeartBeat buildHeartbeat(String watchdogUrl, String moduleId) {
         return Objects.isNull(watchdogUrl) ?
                 ModuleHeartBeat.NOOP : new PollingHeartbeat(
-                new HttpWatchdogClient(watchdogUrl),
+                new ResilienceWatchdogClient(new HttpWatchdogClient(watchdogUrl)),
                 ModuleIdentity.of(moduleId)
         );
     }

@@ -1,5 +1,6 @@
 package software.spool.crawler.internal.strategy;
 
+import software.spool.core.adapter.logging.LoggerFactory;
 import software.spool.core.exception.*;
 import software.spool.core.port.bus.Handler;
 import software.spool.core.utils.polling.CancellationToken;
